@@ -3,7 +3,7 @@ and run on most UNIX/Linux/Mac OS X systems. It can also be compiled
 for Windows. For Mac OS X a pre-compiled version is available from
 the website:
 
-http://evolve.zoo.ox.ac.uk/software/Seq-Gen/
+http://tree.bio.ed.ac.uk/software/Seq-Gen/
 
 There is a manual in HTML format in the doc/ directory of this package.
 
@@ -17,4 +17,4 @@ README file.
 
 Any questions about Seq-Gen should be sent to:
 
-	Andrew Rambaut <andrew.rambaut@zoo.ox.ac.uk>
+	Andrew Rambaut <a.rambaut@ed.ac.uk>
