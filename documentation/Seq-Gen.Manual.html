@@ -1,0 +1,705 @@
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
+	<title>Seq-Gen: Simulation of molecular sequences</title> 
+</head>
+<body>
+	<center>
+		<h1><i>Seq-Gen</i></h1> <h2>Sequence-Generator: An application for the Monte Carlo simulation of molecular sequence evolution along phylogenetic trees. 
+			<br>
+			Version 1.3.2</h2> 
+		<p align="center">
+			<img width="32" height="32" src="icon.gif"> 
+		</p>
+		<h2><i>&copy; Copyright 1996-2005<br>
+		Andrew Rambaut and Nick C. Grassly</i></h2>
+		<h2>Supported by <a href="http://www.royalsoc.ac.uk/">The Royal Society</a></h2> 
+		<address>
+			Department of Zoology, 
+			<br>
+			University of Oxford, 
+			<br>
+			South Parks Road, 
+			<br>
+			Oxford OX1 3PS, U.K. 
+		</address>
+	</center>
+	<h4>Bug fixed in version 1.3.2 - 7 Jan 2005</h4> 
+	<ul>
+		<li>
+			The PAM (Dayhoff) and Blosum matrices were interchanged so specifying one would result in the other being used instead. 
+		</li>
+	</ul>
+	<h4>Bug fixed in version 1.3.1 - 4 Nov 2004</h4> 
+	<ul>
+		<li>
+			Specified nucleotide frequencies were being ignored and equal frequencies being used instead. 
+		</li>
+	</ul>
+	<h4>New Features in version 1.3 - 30 Aug 2004</h4> 
+	<ul>
+		<li>
+			Added amino acid simulation to Seq-Gen. This replaces PSeq-Gen which was not being updated but also adds a number of other amino acid models.
+		</li><li>
+			Removed the limit on tree size. The only limit now is the available memory.
+		</li><li>
+			Updated to the latest version of the MT19937 random number generator. 
+		</li>
+	</ul>
+	<h4>Citation</h4> 
+	<p>
+		If you use this program in a publication please cite the following reference: 
+	</p>
+	<p>
+		<a href="http://evolve.zoo.ox.ac.uk/publications.html?id=167">Rambaut, A. and Grassly, N. C. (1997) Seq-Gen: An application for the Monte Carlo simulation of DNA sequence evolution along phylogenetic trees. <i>Comput. Appl. Biosci.</i> <b>13</b>: 235-238.</a> 
+	</p>
+	<h2>Introduction</h2> 
+	<p>
+		Seq-Gen is a program that will simulate the evolution of nucleotide or amino acid sequences along a phylogeny, using common models of the substitution process. A range of models of molecular evolution are implemented including the general reversible model. Nucleotide/Amino acid frequencies and other parameters of the model may be given and site-specific rate heterogeneity may also be incorporated in a number of ways. Any number of trees may be read in and the program will produce any number of data sets for each tree. Thus large sets of replicate simulations can be easily created. It has been designed to be a general purpose simulator that incorporates most of the commonly used (and computationally tractable) models of molecular sequence evolution. The paper cited above contains details of the algorithm and a short discussion about the uses of Seq-Gen. 
+	</p>
+	<p>
+		<i>For the purposes of this manual, we assume that the user is familiar with the theory and practice of molecular evolution as well as the use of their computer system.</i> 
+	</p>
+	<h2>Requirements</h2> 
+	<p>
+		Seq-Gen is a command-line controlled program written in ANSI C. It should be easily compiled and run on any UNIX system or workstation (which includes Mac OS X). This paper describes the use of Seq-Gen on a UNIX machine. The application requires an amount of memory proportional to the size of each simulated sequence data set. 
+	</p>
+	<p>
+		The Mac OS X version of Seq-Gen now functions in the same way as the UNIX version using the 'Terminal' application. There is however a new graphical user-interface that can be used to run Seq-Gen on Mac OS X (and hopefully soon, Windows and Linux) written by Thomas Wilcox. This is available in the Mac OS X package for Seq-Gen: 
+	</p>
+	<p>
+		<a href="http://evolve.zoo.ox.ac.uk/software/Seq-Gen/">http://evolve.zoo.ox.ac.uk/software/Seq-Gen/</a> 
+	</p>
+	<h2>Acknowledgements</h2> 
+	<p>
+		A.R is supported by a Royal Society University Research Fellowship and previously was supported by grant 50275 from The Wellcome Trust. N.C.G. is also supported by a Royal Society University Research Fellowship. We would like to thank Ziheng Yang for allowing us to use some invaluable code from PAML. 
+	</p>
+	<h2>The models of substitution</h2> 
+	<p>
+		All the models of molecular substitution implemented in Seq-Gen are time-reversible Markov models, and assume evolution is independent and indentical at each site and along each lineage. Almost all models used in the maximum likelihood reconstruction of phylogenies using nucleotide sequences are processes of this type (but see Yang, 1994). Selecting either a nucleotide or amino acid model of substitution will determine which type of data is produced.
+	</p>
+	<h3>Nucleotide models of substitution</h3> 
+	<p>
+		The Hasegawa, Kishino and Yano (HKY) model (Hasegawa et al., 1985) allows for a different rate of transitions and transversions as well as unequal frequencies of the four nucleotides (base frequencies). The parameters requires by this model are transition to transversion ratio (TS/TV) and the base frequencies. There are a number of simpler models that are specific cases of the HKY model. If the base frequencies are set equal (by not specifying base frequencies) then the model becomes equivalent to the Kimura 2-parameter (K2P) model (Kimura, 1980). If the TS TV rates are set to be equal (by not specifying a TS/TV ratio) as well, then it becomes equivalent to the Jukes-Cantor (JC69) model (Jukes and Cantor, 1969). 
+	</p>
+	<p>
+		The F84 model (Felsenstein and Churchill, 1996), as implemented in DNAML in the PHYLIP package (Felsenstein, 1993), is very similar to HKY but differs slightly in how it treats transitions and transversions. This model requires the same parameters as HKY. 
+	</p>
+	<p>
+		Finally, the general reversible process (GTR) model (e.g. Yang, 1994) allows 6 different rate parameters and is the most general model that is still consistent with the requirement of being reversible. The 6 parameters are the relative rates for each type of substitution (i.e. A to C, A to G, A to T, C to G, C to T and G to T). As this is a time-reversible process, the rate parameter of one type of substitution (e.g., A to T) is assumed to be the same as the reverse (e.g., T to A). 
+	</p>
+	<h3>Amino acid models of substitution</h3> 
+	<p>
+		A number of empirical models of amino acid substitution are included with Seq-Gen. These include JTT (Jones et al, 1992), WAG (Whelan & Goldman, 2001), PAM (Dayhoff et al, 1978), Blosum62 (Henikoff & Henikoff, 1992), mtREV (Adachi & Hasegawa, 1996) and cpREV (Adachi & Hasegawa, 2000). These models specify empirical relative rates of substitution and equilibrium amino acid frequencies. Alternatively, the frequencies can be specified or set to be equal. The GENERAL model allows the user to specify the relative rates of substitution and amino acid frequencies.
+	</p>
+	<h2>Site-specific rate heterogeneity</h2> 
+	<p>
+		Site-specific rate heterogeneity allows different sites to evolve at different rates. Two models of rate heterogeneity are implemented. The first is a codon-based model in which the user may specify a different rate for each codon position. This can be used simulate the protein-coding sequences for which the third codon position evolves faster than the first and second because a substitution at this position is considerably less likely to cause an amino-acid substitution. Likewise, the first codon position is expected to evolve slightly faster than the second. Obviously this can only be used with nucleotide models of substitution. 
+	</p>
+	<p>
+		The second model of rate heterogeneity assigns different rates to different sites according to a gamma distribution (Yang, 1993). The distribution is scaled such that the mean rate for all the sites is 1 but the user must supply a parameter which describes its shape. A low value for this parameter (&lt;1.0) simulates a large degree of site-specific rate heterogeneity and as this value increases the simulated data becomes more rate-homogeneous. This can be performed as a continuous model, i.e. every site has a different rate sampled from the gamma distribution of the given shape, or as a discrete model, i.e. each site falls into one of N rate categories approximating the gamma distribution. For a review of site-specific rate heterogeneity and its implications for phylogenetic analyses, see Yang (1996). 
+	</p>
+	<p>
+		Seq-Gen also implements the invariable sites model. With this model, a specified proportion of sites are expected to be invariable across the whole tree. The expected number of substitutions then fall on the remaining variable sites. 
+	</p>
+	<p>
+		The final way of introducing site-specific rate heterogeneity is to specify a number of partitions and give these partitions relative rates. See section 'Input File Format', below, for details about how to do this. 
+	</p>
+	<h2>Compilation and Execution</h2> 
+	<p>
+		Seq-Gen is written in ANSI C and should compile on most UNIX systems and workstations. In this manual I will describe the process of installation and compilation on a UNIX system. This applies to Mac OS X if run under the Terminal. Alternatively a Mac OS X package is available that contains a User-Interface program to run Seq-Gen. 
+	</p>
+	<h3>Compilation on UNIX</h3> 
+	<p>
+		A simple Makefile is included in the package. You should edit this and change the name of the compiler (by default this is <b>cc</b>) and add any flags for optimisation on your system (an example is given for SUN compilers). Once this is done, type: 
+	</p>
+	<p>
+		<code>make</code> 
+	</p>
+	<p>
+		The program will then compile and you will have an executable program: <b>seq-gen</b>. 
+	</p>
+	<h2>Running Seq-Gen</h2> 
+	<p>
+		To run Seq-Gen you type: 
+	</p>
+	<p>
+		<code>seq-gen [parameters] &lt; [trees] &gt; [sequences]</code> 
+	</p>
+	<p>
+		where [parameters] are the parameters for the program (described below), [trees] is the tree file and [sequences] is the name of the file that will contain the simulated sequences. The tree file must contain one or more trees in PHYLIP format (see below). 
+	</p>
+	<p>
+		The sequences produced by Seq-Gen are written to the standard output (and can thus redirected to the output file using <code>&gt; [filename]</code>). Other information and results are written to the standard error and thus will appear on the screen. 
+	</p>
+	<h2>Seeding the random number generator</h2> 
+	<p>
+		Seq-Gen uses a pseudo-random number generator called MT19937 devised by Makoto Matsumoto (see the website <a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html">&gt;http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html&lt;</a> for more details). Like all pseudo-random number generators, this produces a sequence of random numbers for a given 'seed' number. This is why it is pseudo-random: for a particular seed, the algorithm will always give the same sequence of numbers (and thus the same simulated sequences out of Seq-Gen). 
+	</p>
+	<p>
+	The <code>-z</code> option can be used to specify a seed (a non-zero, positive integer). When Seq-Gen is called using the default seed, the actual
+seed used is printed to the screen. If this number is noted down and then specified using the <code>-z</code> option (and exactly the same simulation settings) then Seq-Gen will generate exactly the same simulated data. Thus by recording the options and seed, it is possible to regenerate a simulated data set. This is useful if the simulated datasets are extremely large - they can be deleted and then reconstructed if required. If you do this, keep a copy of the exact version of Seq-Gen you used because this technique may not work when the seed came from a different version of Seq-Gen.
+	<p>
+By default, Seq-Gen uses as its seed the time taken from the system clock (it actually combines the number of seconds that have passed since 1970 with a millisecond timer). This means that if sequential runs of Seq-Gen are done very quickly (e.g., short runs using a script) the default seed could be very similar or even identical. This has serious consequences for the independence of the simulated data. Basically, it is inadvisable to call Seq-Gen many times using a script, running one simulation per call. If the <code>-n</code> option is used to produce multiple simulated data sets from a single call, this will insure adequate independence. If it is necessary to script short runs of Seq-Gen we have two suggestions to avoid the above problem. Firstly, the <code>-z</code> option could be used to call Seq-Gen multiple times in a sequence by deriving a seed for each call using another random number generator. Secondly, adequate time could be allowed to lapse between calls to Seq-Gen (either by using simulating many data sets and then just using the first or by calling a time wasting function in your scripting language). We can't predict whether either of these solutions will work properly so please use caution. 
+	</p>
+	<h2>Input file format</h2> 
+	<p>
+		The tree format is the same as used by PHYLIP (also called the "Newick" format) This is a nested set of bifurcations defined by brackets and commas. Here are two examples: 
+	</p>
+	<p>
+		<code>(((Taxon1:0.2,Taxon2:0.2):0.1,Taxon3:0.3):0.1,Taxon4:0.4);</code> 
+	</p>
+	<p>
+		<code>((Taxon1:0.1,Taxon2:0.2):0.05,Taxon3:0.3,Taxon4:0.4);</code> 
+	</p>
+	<p>
+		The first is a rooted tree because it has a bifurcation at the highest level. The next tree is unrooted - it has a trifurcation at the top level. Each tree should finish with a semicolon. Any number of trees may be in the input file separated by a semi-colon and a new-line. Whilst PHYLIP only allows taxon names of up to 10 characters, Seq-Gen can read trees with taxon names of up to 256 characters. Unless the <code>-o</code> option is set (see below), the output file will conform to the PHYLIP format and the names will be truncated to 10 characters. Note that this could cause some taxon names to be identical and this can cause problems in some phylogenetic packages.
+	</p>
+	<p>
+		Optionally, the user can supply a sequence alignment as input, as well as the trees. This should be in relaxed PHYLIP format. The trees can then be placed in this file at the end, after a line stating how many trees there are. The file may look like this: 
+	</p>
+	<p>
+		<code>4 50 
+			<br>
+			Taxon1 ATCTTTGTAGTCATCGCCGTATTAGCATTCTTAGATCTAA 
+			<br>
+			Taxon2 ATCCTAGTAGTCGCTTGCGCACTAGCCTTCCGAAATCTAG 
+			<br>
+			Taxon3 ACTTCTGTGTTTACTGAGCTACTAGCTTCCCTAAATCTAG 
+			<br>
+			Taxon4 ATTCCTATATTCGCTAATTTCTTAGCTTTCCTGAATCTGG 
+			<br>
+			1 
+			<br>
+			(((Taxon1:0.2,Taxon2:0.2):0.1,Taxon3:0.3):0.1,Taxon4:0.4);</code> 
+	</p>
+	<p>
+		Note that the labels in the alignment do not have to match those in the tree (the ones in the tree will be used for output) - there doesn't even have to be the same number of taxa in the alignment as in the trees. The sequence length supplied by the alignment will be used to obtain the simulated sequence length (unless the <code>-l</code> option is set). The <code>-k</code> option also refers to one of the sequences to specify the ancestral sequence. 
+	</p>
+	<h4>Data partitions with different trees</h4> 
+	<p>
+		The user can input different trees for different partitions of the dataset. A partition is a set of contiguous sites that has evolved under a single tree. Using multiple partitions with different trees, a recombinant history for the sequences can be simulated. Assuming a 1000 bp sequence length and 2 partitions consisting of 400bp and 600bp respectively, the following input treefile could be used: 
+	</p>
+	<p>
+		<code>[400](((Taxon1:0.2,Taxon2:0.2):0.1,Taxon3:0.3):0.1,Taxon4:0.4); 
+			<br>
+		</code><code>[600]((Taxon1:0.1,Taxon3:0.2):0.05,Taxon2:0.3,Taxon4:0.4);</code> 
+	</p>
+	<p>
+		Note the partition lengths in square brackets before each tree. These must sum to the specified total sequence length (given by the <code>-l</code> option). Multiple sets of partition trees may be input with different trees, numbers of partitions and partition lengths. Seq-Gen will work out the number of partitions for each replicate by the partition lengths (the maximum number of partitions must be given by the <code>-p</code> option. 
+	</p>
+	<p>
+		For example: 
+	</p>
+	<p>
+		<code>[400](((Taxon1:0.2,Taxon2:0.2):0.1,Taxon3:0.3):0.1,Taxon4:0.4); 
+			<br>
+			[600]((Taxon1:0.1,Taxon3:0.2):0.05,Taxon2:0.3,Taxon4:0.4); 
+			<br>
+			[300](((Taxon1:0.2,Taxon2:0.2):0.1,Taxon3:0.3):0.1,Taxon4:0.4); 
+			<br>
+			[400]((Taxon1:0.1,Taxon3:0.2):0.05,Taxon2:0.3,Taxon4:0.4); 
+			<br>
+			[300]((Taxon1:0.1,Taxon2:0.2):0.05,Taxon3:0.3,Taxon4:0.4);</code> 
+	</p>
+	<p>
+		will generate 2 datasets, the first consisting of 2 partitions (400bp and 600bp) and the second consisting of 3 partitions (300bp, 400bp and 300bp). 
+	</p>
+	<h4>Data partitions with different rates</h4> 
+	<p>
+		The user can also input the same tree for all partitions of the dataset and then specify a relative rate of evolution for each. This allows partition rate heterogeneity. The relative rates should have a mean of 1.0 (although, if they don't the program will scale them so that they do). 
+	</p>
+	<p>
+		For example: 
+	</p>
+	<p><code>
+		[300, 0.5](((Taxon1:0.2,Taxon2:0.2):0.1,Taxon3:0.3):0.1,Taxon4:0.4); 
+		<br>
+		[400, 1.75](((Taxon1:0.2,Taxon3:0.2):0.1,Taxon2:0.3):0.1,Taxon4:0.4); 
+		<br>
+		[300, 0.75](((Taxon1:0.2,Taxon2:0.2):0.1,Taxon3:0.3):0.1,Taxon4:0.4); 
+	</code></p>
+	<p>
+		will generate 3 partitions (300bp, 400bp and 300bp) with relative rates of 0.5, 1.75 and 0.75 along the same tree. 
+	</p>
+	<h2>Output File Format</h2> 
+	<p>
+		The default format for the output files was chosen for its simplicity and for the wide range of programs that use it. All of the programs in the PHYLIP package that accept molecular sequences can analyse multiple data sets in the format produced by Seq-Gen. Seq-Gen can now also generate NEXUS format output (see the <code>-o</code> option, below) for use with the PAUP program (Swofford, 1993). A PAUP command block (or any other text) can be inserted between each simulated dataset to automate the analysis process (see the <code>-x</code> option, below). 
+	</p>
+	<h2>Parameters to control Seq-Gen</h2> 
+	<p>
+		Options and parameters to Seq-Gen are supplied on the command line. The general format is a minus sign followed by a code letter. If required, the values of any parameters come after the code, separated from both code and each other with either a comma or a space. Some options act like switches and require no parameters. The case of the options is ignored. 
+	</p>
+	<h3>Model</h3> 
+	<p>
+		This option sets the model of nucleotide or amino acid substitution. For nucleotides there is a choice of either <i>F84</i>, <i>HKY</i> (also known as <i>HKY85</i>) or <i>GTR</i> (markov general reversable model - also known as <i>REV</i>). The first two models are quite similar but not identical. They both require a transition transversion ratio and relative base frequencies as parameters. Other models such as <i>K2P</i>, <i>F81</i> and <i>JC69 </i>are special cases of <i>HKY</i> and can be obtained by setting the nucleotide frequencies equal (for <i>K2P</i>) or the transition transversion ratio to 0.5 (for <i>F81</i>) or both (for <i>JC69</i>). A transition transversion ratio of 0.5 is the equivalent to equal rates of tansitions and transversions because there are twice as many possible transversions. 
+	</p>
+	<p>
+		For amino acid models there is the choice of <i>JTT</i>, <i>WAG</i>, <i>PAM</i>, <i>BLOSUM</i>, <i>MTREV</i> or <i>CPREV</i>. By default these models
+specify both the relative rates of substitution and amino acid frequencies. The <i>GENERAL</i> model is the amino acid equivalent of the general time reversible and a relative rate matrix and amino acid frequences can be specified using the <code>-r</code> and <code>-f</code> options, respectively.
+	<p>
+		The usage is: 
+	</p>
+	<blockquote>
+		<p>
+			<code>-m &lt;MODEL&gt;</code> 
+		</p>
+	</blockquote>
+	<p>
+		Where <code>&lt;MODEL&gt;</code> is the model name: <code>HKY</code>, <code>F84</code>, <code>GTR</code>, <code>JTT</code>, <code>WAG</code>, <code>PAM</code>, <code>BLOSUM</code>, <code>MTREV</code>, <code>CPREV</code> or <code>GENERAL</code>. For compatibility with older versions <code>REV</code> is treated as synonymous with <code>GTR</code>.
+	</p>
+	<h3>Length of Sequences</h3> 
+	<p>
+		This option allows the user to set the length in nucleotides or amino acids that each simulated sequence should be. 
+	</p>
+	<blockquote>
+		<p>
+			<code>-l &lt;SEQUENCE_LENGTH&gt;</code> 
+		</p>
+	</blockquote>
+	<p>
+		Where <code>&lt;SEQUENCE_LENGTH&gt;</code> is an integer number greater than zero. If an alignment is supplied as input and this option is not set, then Seq-Gen will use the length of the sequences in the alignment. 
+	</p>
+	<h3>Number of Replicate Datasets</h3> 
+	<p>
+		This option specifies how many separate datasets should be simulated for each tree in the tree file. 
+	</p>
+	<blockquote>
+		<p>
+			<code>-n &lt;NUMBER_OF_DATASETS&gt;</code> 
+		</p>
+	</blockquote>
+	<p>
+		Where <code>&lt;NUMBER_OF_DATASETS&gt;</code> is an integer number that corresponds to the number of datasets to be simulated. 
+	</p>
+	<h3>Number of Data Partitions</h3> 
+	<p>
+		This option specifies how many partitions of each data set should be simulated. Each partition must have its own tree and a number specifying how many sites are in the partition. See 'Input file format', above, for details. Multiple sets of trees are being inputted with varying numbers of partitions, then this should specify the maximum number of partitions that will be required. 
+	</p>
+	<blockquote>
+		<p>
+			<code>-p &lt;NUMBER_OF_PARTITIONS&gt;</code> 
+		</p>
+	</blockquote>
+	<p>
+		Where <code>&lt;NUMBER_OF_PARTITIONS&gt;</code> is an integer number that corresponds to the number of partitions for each dataset. 
+	</p>
+	<h3>Scale branch lengths</h3> 
+	<p>
+		This option allows the user to set a value with which to scale the branch lengths in order to make them equal the expected number of substitutions per site for each branch. Basically Seq-Gen multiplies each branch length by this value. 
+	</p>
+	<blockquote>
+		<p>
+			<code>-s &lt;SCALE&gt;</code> 
+		</p>
+	</blockquote>
+	<p>
+		Where <code>&lt;SCALE&gt;</code> is a decimal number greater than zero. For example if you give an value of 0.5 then each branch length would be halved before using it to simulate the sequences. 
+	</p>
+	<h3>Scale tree length</h3> 
+	<p>
+		This option allows the user to set a value which is the desired length of each tree in units of subsitutions per site. The term <i>tree length</i> here is the distance from the root to any one of the tips in units of mean number of subsitutions per site. This option can only be used when the input trees are rooted and ultrametric (no difference in rate amongst the lineages). This has the effect of making all the trees in the input file of the same length before simulating data. 
+	</p>
+	<blockquote>
+		<p>
+			<code>-d &lt;SCALE&gt;</code> 
+		</p>
+	</blockquote>
+	<p>
+		Where <code>&lt;SCALE&gt;</code> is a decimal number greater than zero. The option multiplies each branch length by a value equal to SCALE divided by the actual length of the tree. 
+	</p>
+	<h3>Codon-Specific Rate Heterogeneity</h3> 
+	<p>
+		Using this option the user may specify the relative rates for each codon position. This allows codon-specific rate heterogeneity to be simulated. The default is no site-specific rate heterogeneity. This option can only be used with nucleotide substitution models.
+	</p>
+	<blockquote>
+		<p>
+			<code>-c &lt;CODON_POSITION_RATES&gt;</code> 
+		</p>
+	</blockquote>
+	<p>
+		Where <code>&lt;CODON_POSITION_RATES&gt;</code> is three decimal numbers that specify the relative rates of substitution at each codon position, separated by commas or spaces. 
+	</p>
+	<h3>Gamma Rate Heterogeneity</h3> 
+	<p>
+		Using this option the user may specify a shape for the gamma rate heterogeneity called alpha. The default is no site-specific rate heterogeneity. 
+	</p>
+	<blockquote>
+		<p>
+			<code>-a &lt;ALPHA&gt;</code> 
+		</p>
+	</blockquote>
+	<p>
+		Where <code>&lt;ALPHA&gt;</code> is a real number &gt;0 that specifies the shape of the gamma distribution to use with gamma rate heterogeneity. If this is used with the <code>-g</code> option, below, then a discrete model is used, otherwise a continuous one. 
+	</p>
+	<h3>Discrete Gamma Rate Heterogeneity</h3> 
+	<p>
+		Using this option the user may specify the number of categories for the discrete gamma rate heterogeneity model. The default is no site-specific rate heterogeneity (or the continuous model if only the <code>-a</code> option is specified). 
+	</p>
+	<blockquote>
+		<p>
+			<code>-g &lt;NUM_CATEGORIES&gt;</code> 
+		</p>
+	</blockquote>
+	<p>
+		Where <code>&lt;NUM_CATEGORIES&gt;</code> is an integer number between 2 and 32 that specifies the number of categories to use with the discrete gamma rate heterogeneity model. 
+	</p>
+	<h3>Proportion of Invariable Sites</h3> 
+	<p>
+		Using this option the user may specify the proportion of sites that should be invariable. These sites will be chosen randomly with this expected frequency. The default is no invariable sites. Invariable sites are sites that cannot change as opposed to sites which don't exhibit any changes due to chance (and perhaps a low rate). 
+	</p>
+	<blockquote>
+		<p>
+			<code>-i &lt;PROPORTION_INVARIABLE&gt;</code> 
+		</p>
+	</blockquote>
+	<p>
+		Where <code>&lt;PROPORTION_INVARIABLE&gt;</code> is an real number &gt;= 0.0 and &lt;1.0 that specifies the proportion of invariable sites. 
+	</p>
+	<h3>Relative State Frequencies</h3> 
+	<p>
+		This option is used to specify the equilibrium frequencies of the four nucleotides or twenty amino acids. If simulating nucleotides, the default (when no frequencies are specified) will be that all frequencies are
+equal. When simulating amino acids the default frequencies will be set to the empirical values associated with the specified substitution model (with the exception of the <code>GENERAL</code> model which has a default of equal frequencies).
+	</p>
+	<blockquote>
+		<p>
+			<code>-f &lt;STATE_FREQUENCIES&gt;</code> 
+		</p>
+	</blockquote>
+	<p>
+		Where <code>&lt;STATE_FREQUENCIES&gt;</code> are either four decimal numbers for the frequencies of the nucleotides A, C, G and T or 20 numbers for the amino acid frequencies (in the order ARNDCQEGHILKMFPSTWYV) separated by spaces or commas. 
+	</p>
+	<blockquote>
+		<p>
+			<code>-fe</code> 
+		</p>
+	</blockquote>
+	<p>
+		This results in all the frequencies being set equal. This can be used to force equal frequencies for empirical amino acid models. 
+	</p>
+	<h3>Transition Transversion Ratio</h3> 
+	<p>
+		This option allows the user to set a value for the transition transversion ratio (TS/TV). This is only valid when either the HKY or F84 model has been selected. The default is to have a TS/TV of 0.5 which gives equal instantaneous rates of transitions and transversions. Thus omitting the <code>-t</code> option with the <code>-mHKY</code> option results in the <code>F81</code> model (or the <code>JC69</code> if the <code>-f</code> option
+is also omitted).
+	</p>
+	<blockquote>
+		<p>
+			<code>-t &lt;TRANSITION_TRANSVERSION_RATIO&gt;</code> 
+		</p>
+	</blockquote>
+	<p>
+		Where <code>&lt;TRANSITION_TRANSVERSION_RATIO&gt;</code> is a decimal number greater than zero. 
+	</p>
+	<h3>General Reversable Rate Matrix</h3> 
+	<p>
+		This option allows the user to set values for the relative rate of substitutions between nucleotide or amino acid states. This is only valid when either the <GTR> (nucleotides) or <GENERAL> (amino acids) model has been selected. 
+	</p>
+	<blockquote>
+		<p>
+			<code>-r &lt;RATE_MATRIX_VALUES&gt;</code> 
+		</p>
+	</blockquote>
+	<p>
+		Where <code>&lt;RATE_MATRIX_VALUES&gt;</code> are decimal numbers for the relative rates of substitutions from (for nucleotides) A to C, A to G, A to T, C to G, C to T and G to T respectively, separated by spaces or commas. For amino acids there are 190 rate required representing the upper (off-diagonal) triangle of a 20x20 matrix with amino acids in the order ARNDCQEGHILKMFPSTWYV. The matrix is symmetrical so the reverse transitions equal the ones set (e.g. C to A equals A to C) and therefore only six values need be set.  
+	</p>
+	<h3>Ancestral Sequence</h3> 
+	<p>
+		This option allows the user to use a supplied sequence as the ancestral sequence at the root (otherwise a random sequence is used). 
+	</p>
+	<blockquote>
+		<p>
+			<code>-k &lt;ANCESTRAL_SEQUENCE_NUMBER&gt;</code> 
+		</p>
+	</blockquote>
+	<p>
+		Where <code>&lt;ANCESTRAL_SEQUENCE_NUMBER&gt;</code> is an integer number greater than zero which refers to one of the sequences supplied as input (see 'Input File Format', above). 
+	</p>
+	<h3>Random Number Seed</h3> 
+	<p>
+		This option allows the user to specify a seed for the random number generator. Using the same seed (with the same input) will result in identical simulated datasets. This is useful because you can then delete the (often large) simulated sequence files to save disk space. To recreate a set of simulations, you must use exactly the same model options. The default is to obtain a seed from the system clock which will be displayed on the screen allowing it noted down. 
+	</p>
+	<blockquote>
+		<p>
+			<code>-z &lt;RANDOM_NUMBER_SEED&gt;</code> 
+		</p>
+	</blockquote>
+	<p>
+		Where <code>&lt;RANDOM_NUMBER_SEED&gt;</code> is an integer number. 
+	</p>
+	<h3>Output file format</h3> 
+	<p>
+		This option selects the format of the output file. The default is PHYLIP format. 
+	</p>
+	<blockquote>
+		<p>
+			<code>-op</code> 
+		</p>
+	</blockquote>
+	<p>
+		PHYLIP format. 
+	</p>
+	<blockquote>
+		<p>
+			<code>-or</code> 
+		</p>
+	</blockquote>
+	<p>
+		Relaxed PHYLIP format: PHYLIP format expects exactly 10 characters for the name (padded with spaces if the name is actually less than 10). With this option the output file can have up to 256 characters in the name, followed by a single space before the sequence. The longer taxon names are read from the tree. Some programs can read this and it keeps long taxon names. 
+	</p>
+	<blockquote>
+		<p>
+			<code>-on</code> 
+		</p>
+	</blockquote>
+	<p>
+		NEXUS format: This creates a NEXUS file which will load into PAUP. It generates one DATA block per dataset. It also includes the simulation settings as comments which will be ignored by PAUP. 
+	</p>
+	<h3>Insert Text File into Output</h3> 
+	<p>
+		This option allows the user to specify text file which will be inserted into the output file after every dataset. This allows the user to insert a PAUP command block or a tree (or anything else) into the file to automate the analysis. 
+	</p>
+	<blockquote>
+		<p>
+			<code>-x &lt;TEXT_FILE_NAME&gt;</code> 
+		</p>
+	</blockquote>
+	<p>
+		Where <code>&lt;TEXT_FILE_NAME&gt;</code> is the name of a file. For Macintosh users this file must be in the same folder as the Seq-Gen program (I find it convenient to copy the Seq-Gen program and move it into the folder in which my datafile are and then delete it afterwards). For UNIX users, this can be specified with a path or should be in the current directory (the one you were in when you run Seq-Gen). This option plus NEXUS format (<code>-on</code> option) replaces the previously included separate program, Phy2Nex. 
+	</p>
+	<h3>Write Ancestral Sequences</h3> 
+	<p>
+		This option allows the user to obtain the sequences for each of the internal nodes in the tree. The sequences are written out along with the sequences for the tips of the tree in relaxed PHYLIP format (see above). 
+	</p>
+	<blockquote>
+		<p>
+			<code>-wa</code> 
+		</p>
+	</blockquote>
+	<h3>Write Site Rates</h3> 
+	<p>
+		This option allows the user to obtain the relative rate of substitution for each site as used in each simulation. This will go to stderr (or the screen) and will be produced for each replicate simulation. 
+	</p>
+	<blockquote>
+		<p>
+			<code>-wr</code> 
+		</p>
+	</blockquote>
+	<h3>Minimum Information</h3> 
+	<p>
+		This option prevents any output except the final trees and any error messages. 
+	</p>
+	<blockquote>
+		<p>
+			<code>-q</code> 
+		</p>
+	</blockquote>
+	<h3>Help</h3> 
+	<p>
+		This option prints a help message describing the options and then quits. 
+	</p>
+	<blockquote>
+		<p>
+			<code>-h</code> 
+		</p>
+	</blockquote>
+	<h2>An example of performing simulations using Seq-Gen</h2> 
+	<p>
+		An example phylogeny is included with this package (called 'example.tree'). This is an unrooted tree in PHYLIP format (see 'Input file format', above). To use this tree to simulate 3 sets of sequences 50 nucleotide long using the HKY model, a transition-transversion ratio of 3.0 and unequal base frequencies, type the following: 
+	</p>
+	<blockquote>
+		<p>
+			<code>seq-gen -mHKY -t3.0 -f0.3,0.2,0.2,0.3 -l40 -n3 &lt; example.tree &gt; example.dat</code> 
+		</p>
+	</blockquote>
+	<p>
+		This produces a PHYLIP format data file called 'example.dat'; which looks something like this: 
+	</p>
+	<p>
+		<code>4 50 
+			<br>
+			Taxon1 ATCTTTGTAGTCATCGCCGTATTAGCATTCTTAGATCTAA 
+			<br>
+			Taxon2 ATCCTAGTAGTCGCTTGCGCACTAGCCTTCCGAAATCTAG 
+			<br>
+			Taxon3 ACTTCTGTGTTTACTGAGCTACTAGCTTCCCTAAATCTAG 
+			<br>
+			Taxon4 ATTCCTATATTCGCTAATTTCTTAGCTTTCCTGAATCTGG 
+			<br>
+			4 50 
+			<br>
+			Taxon1 AGAACACAAGTCCCAAATAACCGAACTGGAGCGGGCAGTT 
+			<br>
+			Taxon2 AAGACACAGGCCTAAACTGAGCGTACTGGAACGAGTCGTT 
+			<br>
+			Taxon3 AAGACACAGGTCTCACTTGACTGCGTTGAAACGGTCCGTT 
+			<br>
+			Taxon4 AAGACCCAGACTGTAACTTGTCGGACTGGAATGGACCGTT 
+			<br>
+			4 50 
+			<br>
+			Taxon1 CAGCTGAGGCATTACGAAGCGCCCGGCCGGCCGGACGATT 
+			<br>
+			Taxon2 TAACTGAGACAGTACGAAACGCGCAATGGGCCCCAAAACC 
+			<br>
+			Taxon3 CGGTTAGGACATGACGAATCGCCCAGCGGGCCTCCGGACC 
+			<br>
+			Taxon4 CAACTGGAATGTTACCAGCTGCCTAGGGTGCTCCGAGGAC </code> 
+	</p>
+	<h2>References</h2> 
+	<p>
+		Adachi, J., and Hasegawa, M. (1996) Model of amino acid substitution in proteins encoded by mitochondrial DNA. J. Mol. Evol. 42: 459-468.
+	</p>
+	<p>
+		Adachi, J., Waddell, P.J., Martin, W., and Hasegawa, M. (2000) Plastid genome phylogeny and a model of amino acid substitution for proteins encoded by chloroplast DNA. J. Mol. Evol. 50, 348358. 
+	</p>
+	<p>
+		Dayhoff, M.O., Schwartz, R.M., Orcutt, B.C. (1978) A model of evolutionary change in proteins. In Dayhoff, M.O. (ed.) Atlas of Protein Sequence Structur., Vol5, Suppl. 3, National Biomedical Research Foundation, Washington DC, pp. 345-352.
+	</p>
+	<p>
+		Felsenstein, J. (1981) Evolutionary trees from DNA sequences: a maximum likelihood approach. J. Mol. Evol., 17, 368-376. 
+	</p>
+	<p>
+		Felsenstein, J. (1993) Phylogeny Inference Package (PHYLIP), Version 3.5. Department of Genetics, University of Washington, Seattle. 
+	</p>
+	<p>
+		Felsenstein, J. and Churchill, G. (1996) A hidden markov model approach to variation among sites in rate of evolution. Molecular Biology and Evolution, 13, 93-104. 
+	</p>
+	<p>
+		Hasegawa, M., Kishino, H. and Yano, T. (1985) Dating the human-ape splitting by a molecular clock of mitochondrial DNA. J. Mol. Evol., 22, 160-174. 
+	</p>
+	<p>
+		Henikoff, S., and Henikoff, J. G. (1992) ???. PNAS USA 89:10915-10919.
+	</p>
+	<p>
+		Jones, D.T., Taylor, W.R. and Thornton, J.M. (1992) The rapid generation of mutation data matrices from protein sequences. CABIOS. 8: 275-282
+	</p>
+	<p>
+		Jukes, T. H. and Cantor, C. R. (1969) Evolution of protein molecules. In Munro, H. N. (ed.) Mammalian Protein Metabolism, Academic Press, New York, pp. 21-123. 
+	</p>
+	<p>
+		Kimura, M. (1980) A simple method for estimating evolutionary rates of base substitutions through comparative studies of nucleotide sequences. J. Mol. Evol., 16, 111-120. 
+	</p>
+	<p>
+		Swofford, D. L. (1993) Phylogenetic analysis using parsimony (PAUP), Version 3.1.1. Illinois Natural History Survey, Champaign. 
+	</p>
+	<p>
+		Thorne, J. L., Kishino, H. and Felsenstein, J. (1992) Inching toward reality: An improved likelihood model of sequence evolution. J. Mol. Evol., 34, 3-16. 
+	</p>
+	<p>
+Whelan, S. and Goldman, N. (2001) A general empirical model of protein evolution derived from multiple protein families using a maximum-likelihood approach. Mol. Biol. Evol. 18, 691Ð699.
+	</p>
+	<p>
+		Yang, Z. (1993) Maximum-likelihood estimation of phylogeny from DNA sequences when substitution rates differ over sites. Mol. Biol. Evol., 10, 1396-1401. 
+	</p>
+	<p>
+		Yang, Z. (1994) Estimating the pattern of nucleotide substitution. J. Mol. Evol., 39, 105-111. 
+	</p>
+	<p>
+		Yang, Z. (1996) Among-site rate variation and its impact on phylogenetic analyses. Tr. Ecol. Evol., 11, 367-372. 
+	</p>
+	<h2>Version History.</h2> 
+	<h4>Bug fixed in version 1.3.2 - 7 Jan 2005</h4> 
+	<ul>
+		<li>
+			The PAM (Dayhoff) and Blosum matrices were interchanged so specifying one would result in the other being used instead. 
+		</li>
+	</ul>
+	<h4>Bug fixed in version 1.3.1 - 4 Nov 2004</h4> 
+	<ul>
+		<li>
+			Specified nucleotide frequencies were being ignored and equal frequencies being used instead. 
+		</li>
+	</ul>
+	<h4>New Features in version 1.3 - 30 Aug 2004</h4> 
+	<ul>
+		<li>
+			Added amino acid simulation to Seq-Gen. This replaces PSeq-Gen which was not being updated but also adds a number of other amino acid models.
+		</li><li>
+			Removed the limit on tree size. The only limit now is the available memory.
+		</li><li>
+			Updated to the latest version of the MT19937 random number generator. 
+		</li>
+	</ul>
+	<h4>New Features in version 1.2.7 - 19 Nov 2003</h4> 
+	<ul>
+		<li>
+			Replaced the random number generator with the high quality Mersenne Twister. When Seq-Gen was originally written, the computation of random numbers was a significant burden but with the speed of current computers this is no longer an issue. 
+		</li>
+	</ul>
+	<h4>New Features in version 1.2.6 - 4 Dec 2002</h4> 
+	<ul>
+		<li>
+			Improved resolution of the automatic seeding of the random number generator by adding some milliseconds to it. Thus runs of Seq-Gen that are less than a second apart will have different seeds. This probably only matters on UNIX machines using scripts to do multiple (short) runs. 
+		</li>
+	</ul>
+	<h4>New Features in version 1.2.5 - 25 Sep 2001</h4> 
+	<ul>
+		<li>
+			New option to write the relative rate used for each for each site 
+		</li>
+	</ul>
+	<h4>New Features in version 1.2.4 - 6 Jul 2001</h4> 
+	<ul>
+		<li>
+			Can now specify a relative rate for each partition. The partitions are specified in the tree files but all the partitions can be given the same tree but different rates. 
+		</li>
+	</ul>
+	<p>
+		Bug fixed which resulted in missing 'Begin Data' in NEXUS files when creating a single set of sequences. 
+	</p>
+	<h4>New Features in version 1.2.3 - 6 Apr 2001</h4> 
+	<ul>
+		<li>
+			Added feature write ancestral sequences (-w option). 
+		</li>
+		<li>
+			Improved the interface of the Macintosh version. Can now drag a tree onto the application - this tree will then be selected as input in the opening dialog box. This box has been made wider to allow longer command-lines. 
+		</li>
+		<li>
+			New Macintosh Carbon version that will run on MacOS X and MacOS 9.0 this can be found in the Macintosh package along with a version that will run on pre-MacOS 9 computers. 
+		</li>
+	</ul>
+	<p>
+		Bug fixed in Macintosh which would result in some of the end of a long command line being ignored. 
+	</p>
+	<h4>Bug fixed in Version 1.22 - 4 Feb 2001</h4> 
+	<p>
+		Fixed a bug which prevented unrooted trees from loading (complained about polytomies in the tree). 
+	</p>
+	<h4>Bug fixed in version 1.21</h4> 
+	<p>
+		Fixed a bug which prevented single partitions being simulated (i.e. most people's simulations). Updated make file in UNIX version. 
+	</p>
+	<h4>New Features in version 1.2</h4> 
+	<ul>
+		<li>
+			Invariable sites model. You can now specify a proportion of invariable sites using the<b> -i</b> option, outlined below. 
+		</li>
+		<li>
+			The default model is now HKY (instead of F84). I think it is now more widely used and the computational difference between them has become small. 
+		</li>
+		<li>
+			If you don't specify a TS/TV under either the HKY or F84 models, then the TS/TV is chosen to make the instantaneous rate of TSs and TVs equal. This has the effect of collapsing both models to K2P or F81 (depending on whether the base frequencies are equal or note). For the F84 this TS/TV will be 0.5 but for HKY this will be dependent on the base frequencies (for equal base frequencies this will be 0.5). TS/TV used to always default to an arbitrary value of 2.0. 
+		</li>
+		<li>
+			Output in NEXUS format. You can choose the format of the output using the &#o option followed by a code specifying PHYLIP, relaxed PHYLIP or NEXUS. When creating NEXUS format files, the name of a file containing a PAUP command block (or any other text) can be specified and this will be inserted into the output after every simulated dataset. This is done with the <b>-x</b> command. 
+		</li>
+		<li>
+			Simulate different partitions of the data under different trees. This allows the simulation of a recombinant history. The trees for each partition are given with the length of the partition in square brackets before it. The<b> -p</b> option specifies the number of partitions (the <b>-p</b> option used to specify the output format). 
+		</li>
+		<li>
+			Will now detect and disallow trees containing polytomies. Polytomies can be simulated by Seq-Gen if they are resolved arbitrarily with zero internal branches. This can be done automatically by TreeEdit, available at <a href="http://evolve.zoo.ox.ac.uk/software/TreeEdit/">http://evolve.zoo.ox.ac.uk/software/TreeEdit/</a>. 
+		</li>
+		<li>
+			Version 1.2 no longer has a Mac 68K executable. It should still compile for these machines but I don't have the time to support it. 
+		</li>
+		<li>
+			The default seed to the random number generator now has more resolution. Previously Seq-Gen used the system time in seconds. This means that if two short runs of Seq-Gen we executed in less than a second, the same random number seed could be used resulting in two identical datasets. It now adds a higher resolution clock to the seed. It will also print out the seed used so that you can check for this problem. You can also specify your own seed using the <b>-z </b>option. If you write down the seed outputted, you can use this to recreate an exact set of simulations. This is useful because you can then delete the (often large) simulated sequence files to save disk space. To recreate a set of simulations, you must use exactly the same model options. 
+		</li>
+	</ul>
+	<h4>Bug fixed in version 1.1</h4> 
+	<p>
+		WARNING: a very important bug has been fixed in this release. Many apologies to anyone to whom this is relevent. All versions of Seq-Gen prior to this have not reassigned the gamma rate categories for each site between replicate simulations. This means that the same site will have the same rate (in both the discrete and continuous model) between replicates. This will reduce the amount of variability in a set of simulations. 
+	</p>
+</body>
+</html>
