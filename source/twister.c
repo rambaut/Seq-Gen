@@ -187,7 +187,7 @@ double genrand_res53(void)
 } 
 /* These real versions are due to Isaku Wada, 2002/01/09 added */
 
-void SetSeed(unsigned long seed)
+void TwisterSetSeed(unsigned long seed)
 {
 	init_genrand(seed);
 }
@@ -223,7 +223,7 @@ unsigned long CreateSeed( )
 	return ( h1 + differ++ ) ^ h2;
 }
 
-double rndu()
+double Twisterrndu()
 {
 	return genrand_real1();
 }

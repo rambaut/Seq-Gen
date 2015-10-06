@@ -16,32 +16,32 @@
 #include "twister.h"
 #include "gamma.h"
 
-double LnGamma (double alpha);
-double IncompleteGamma (double x, double alpha, double ln_gamma_alpha);
-double PointNormal (double prob);
-double PointChi2 (double prob, double v);
+double lnGamma (double alpha);
+double incompleteGamma (double x, double alpha, double ln_gamma_alpha);
+double pointNormal (double prob);
+double pointChi2 (double prob, double v);
 
 	
-double rndgamma1 (double s);
-double rndgamma2 (double s);
+double rndGamma1 (double s);
+double rndGamma2 (double s);
 
-double rndgamma (double s)
+double rndGamma (double s)
 {
 	double	r=0.0;
 	
 	if (s <= 0.0)      
 		return 0;
 	else if (s < 1.0)  
-		r = rndgamma1 (s);
+		r = rndGamma1 (s);
 	else if (s > 1.0)  
-		r = rndgamma2 (s);
+		r = rndGamma2 (s);
 	else           
-		r =- log(rndu());
+		r =- log(Twisterrndu());
 	return (r);
 }
 
 
-double rndgamma1 (double s)
+double rndGamma1 (double s)
 {
 
 	double			r, x=0.0, small=1e-37, w;
@@ -57,14 +57,14 @@ double rndgamma1 (double s)
 		}
 	for (;;) 
 		{
-		r = rndu();
+		r = Twisterrndu();
 		if (r > p)        
 			x = a-log((1.0-r)/(1.0-p)), w=a*log(x)-d;
 		else if (r>uf)  
 			x = a*pow(r/p,1/s), w=x;
 		else            
 			return (0.0);
-		r = rndu();
+		r = Twisterrndu();
 		if (1.0-r <= w && r > 0.0)
 			if (r*(w+1.0) >= 1.0 || -log(r) <= w)  
 				continue;
@@ -74,7 +74,7 @@ double rndgamma1 (double s)
 }
 
 
-double rndgamma2 (double s)
+double rndGamma2 (double s)
 {
 
 	double			r ,d, f, g, x;
@@ -88,13 +88,13 @@ double rndgamma2 (double s)
 		}
 	for (;;) 
 		{
-		r = rndu();
+		r = Twisterrndu();
 		g = r-r*r;
 		f = (r-0.5)*h/sqrt(g);
 		x = b+f;
 		if (x <= 0.0) 
 			continue;
-		r = rndu();
+		r = Twisterrndu();
 		d = 64*r*r*g*g*g;
 		if (d*x < x-2.0*f*f || log(d) < 2*(b*log(x/b)-f))  
 			break;
@@ -103,7 +103,7 @@ double rndgamma2 (double s)
 }
 
 
-double LnGamma (double alpha)
+double lnGamma (double alpha)
 {
 /* returns ln(gamma(alpha)) for alpha>0, accurate to 10 decimal places.  
    Stirling's formula is used for the central polynomial part of the procedure.
@@ -123,7 +123,7 @@ double LnGamma (double alpha)
 	       +.083333333333333)/x;  
 }
 
-double IncompleteGamma (double x, double alpha, double ln_gamma_alpha)
+double incompleteGamma (double x, double alpha, double ln_gamma_alpha)
 {
 /* returns the incomplete gamma ratio I(x,alpha) where x is the upper 
 	   limit of the integration and alpha is the shape parameter.
@@ -184,7 +184,7 @@ double IncompleteGamma (double x, double alpha, double ln_gamma_alpha)
 /* functions concerning the CDF and percentage points of the gamma and
    Chi2 distribution
 */
-double PointNormal (double prob)
+double pointNormal (double prob)
 {
 /* returns z so that Prob{x<z}=prob where x ~ N(0,1) and (1e-12)<prob<1-(1e-12)
    returns (-9999) if in error
@@ -212,7 +212,7 @@ double PointNormal (double prob)
 }
 
 
-double PointChi2 (double prob, double v)
+double pointChi2 (double prob, double v)
 {
 /* returns z so that Prob{x<z}=prob where x is Chi2 distributed with df=v
    returns -1 if in error.   0.000002<prob<0.999998
@@ -226,7 +226,7 @@ double PointChi2 (double prob, double v)
 
    if (p<.000002 || p>.999998 || v<=0) return (-1);
 
-   g = LnGamma (v/2);
+   g = lnGamma (v/2);
    xx=v/2;   c=xx-1;
    if (v >= -1.24*log(p)) goto l1;
 
@@ -244,12 +244,12 @@ l2:
    else                       goto l2;
   
 l3: 
-   x=PointNormal (p);
+   x=pointNormal (p);
    p1=0.222222/v;   ch=v*pow((x*sqrt(p1)+1-p1), 3.0);
    if (ch>2.2*v+6)  ch=-2*(log(1-p)-c*log(.5*ch)+g);
 l4:
    q=ch;   p1=.5*ch;
-   if ((t=IncompleteGamma (p1, xx, g))<0) {
+   if ((t=incompleteGamma (p1, xx, g))<0) {
       return (-1);
    }
    p2=p-t;
@@ -269,9 +269,9 @@ l4:
 }
 
 
-#define PointGamma(prob,alpha,beta) PointChi2(prob,2.0*(alpha))/(2.0*(beta))
+#define pointGamma(prob,alpha,beta) pointChi2(prob,2.0*(alpha))/(2.0*(beta))
 
-int DiscreteGamma (double freqK[], double rK[], 
+int discreteGamma (double freqK[], double rK[], 
     double alfa, double beta, int K, int median)
 {
 /* discretization of gamma distribution with equal proportions in each 
@@ -281,16 +281,16 @@ int DiscreteGamma (double freqK[], double rK[],
    double gap05=1.0/(2.0*K), t, factor=alfa/beta*K, lnga1;
 
    if (median) {
-      for (i=0; i<K; i++) rK[i]=PointGamma((i*2.0+1)*gap05, alfa, beta);
+      for (i=0; i<K; i++) rK[i]=pointGamma((i*2.0+1)*gap05, alfa, beta);
       for (i=0,t=0; i<K; i++) t+=rK[i];
       for (i=0; i<K; i++)     rK[i]*=factor/t;
    }
    else {
-      lnga1=LnGamma(alfa+1);
+      lnga1=lnGamma(alfa+1);
       for (i=0; i<K-1; i++)
-	 freqK[i]=PointGamma((i+1.0)/K, alfa, beta);
+	 freqK[i]=pointGamma((i+1.0)/K, alfa, beta);
       for (i=0; i<K-1; i++)
-	 freqK[i]=IncompleteGamma(freqK[i]*beta, alfa+1, lnga1);
+	 freqK[i]=incompleteGamma(freqK[i]*beta, alfa+1, lnga1);
       rK[0] = freqK[0]*factor;
       rK[K-1] = (1-freqK[K-2])*factor;
       for (i=1; i<K-1; i++)  rK[i] = (freqK[i]-freqK[i-1])*factor;

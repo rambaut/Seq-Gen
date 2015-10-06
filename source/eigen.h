@@ -16,9 +16,9 @@
 #ifndef _EIGEN_H_
 #define _EIGEN_H_
 
-int abyx (double a, double x[], int n);
-int xtoy (double x[], double y[], int n);
-int matinv( double x[], int n, int m, double space[]);
+//int abyx (double a, double x[], int n);
+//int xtoy (double x[], double y[], int n);
+//int matinv( double x[], int n, int m, double space[]);
 int eigen(int job, double A[], int n, double rr[], double ri[],
           double vr[], double vi[], double w[]);
 

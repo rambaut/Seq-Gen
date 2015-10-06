@@ -50,6 +50,7 @@
 #include "model.h"
 #include "nucmodels.h"
 #include "aamodels.h"
+#include "codmodels.h"
 #include "progress.h"
 #include "twister.h"
 
@@ -122,6 +123,11 @@ static void PrintUsage()
 	fprintf(stderr, "  -r: #1 .. #190 = general rate matrix [default = all 1.0].\n");
 	fprintf(stderr, "  -f: #1 .. #20 = amino acid frequencies e=equal [default = matrix freqs].\n");
 	
+	fprintf(stderr, "\n Codon model specific options:\n");
+	fprintf(stderr, "  -t: # = transition-transversion ratio [default = equal rate].\n");
+	fprintf(stderr, "  -b: # = dN/dS ratio (omega) [default = 1.0].\n");
+	fprintf(stderr, "  -f: #1 .. #61 = codon frequencies e=equal [default = all equal].\n");
+	
 	fprintf(stderr, "\n Miscellaneous options:\n");
 	fprintf(stderr, "  -z: # = seed for random number generator [default = system generated].\n");
 	fprintf(stderr, "  -o: Output file format [default = PHYLIP]\n");
@@ -166,6 +172,7 @@ void ReadParams(int argc, char **argv)
 	equalFreqs = 1;
 	equalTstv = 1;
 	tstv=0.50002;
+	omega = 1;
 	
 	for (i = 0; i < NUM_AA_REL_RATES; i++) {
 		aaRelativeRate[i] = 1.0;
@@ -174,8 +181,13 @@ void ReadParams(int argc, char **argv)
 	for (i = 0; i < NUM_AA; i++) {
 		aaFreq[i] = 1.0;
 	}
+
+	for (i = 0; i < NUM_COD; i++) {
+		codFreq[i] = 1.0;
+	}
 	
 	aaFreqSet = 0;
+	codFreqSet = 0;
 		
 	numSites=-1;
 	numDatasets=1;
@@ -224,9 +236,13 @@ void ReadParams(int argc, char **argv)
 							if (model <= GTR) {
 								isNucModel = 1;
 								numStates = 4;
-							} else {
+							} else if (model <= AA_GENERAL) {
 								isNucModel = 0;
 								numStates = 20;
+							}
+							else {
+								isNucModel = 2;
+								numStates = 61;
 							}
 						} else if (strncmp(P, "REV", 3)==0) {
 							model=GTR;
@@ -299,7 +315,7 @@ void ReadParams(int argc, char **argv)
 					}
 				break;
 				case 'C':
-					if (!isNucModel) {
+					if (!(isNucModel==1)) {
 						fprintf(stderr, "You can only have codon rates when using nucleotide models\n\n");
 						exit(0);
 					}
@@ -349,7 +365,7 @@ void ReadParams(int argc, char **argv)
 					}
 				break;
 				case 'F':
-					if (isNucModel) {
+					if (isNucModel==1) {
 						if (toupper(*P)=='E'){
 							/* do nothing - equal freqs is default for nucleotides */
 						} else {
@@ -359,7 +375,7 @@ void ReadParams(int argc, char **argv)
 								exit(0);
 							}
 						}
-					} else {
+					} else if(isNucModel==0) {
 						aaFreqSet = 1;
 						if (toupper(*P)=='E'){
 							equalFreqs = 1;
@@ -373,16 +389,40 @@ void ReadParams(int argc, char **argv)
 								exit(0);
 							}
 						}
+					} else {
+						codFreqSet = 1;
+						if (toupper(*P)=='E'){
+							equalFreqs = 1;
+							for(j=0;j<NUM_COD;j++) {
+								codFreq[j]=1./61.;
+							}
+						} else {
+							equalFreqs = 0;
+							if (GetDoubleParams(argc, argv, &i, P, NUM_COD, codFreq)) {
+								fprintf(stderr, "Bad Codon Frequencies: %s\n\n", argv[i]);
+								exit(0);
+							}
+						}
 					}
 				break;
 				case 'T':
-					if (model != HKY && model != F84) {
-						fprintf(stderr, "You can only have a transition/transversion ratio when using HKY or F84 models\n\n");
+					if (model != HKY && model != F84 && model != NY98) {
+						fprintf(stderr, "You can only have a transition/transversion ratio when using HKY, F84 or NY98 models\n\n");
 						exit(0);
 					}
 					equalTstv = 0;
 					if (GetDoubleParams(argc, argv, &i, P, 1, &tstv)) {
 						fprintf(stderr, "Bad Transition-Transversion Ratio: %s\n\n", argv[i]);
+						exit(0);
+					}
+				break;
+				case 'B':
+					if (model != NY98) {
+						fprintf(stderr, "You can only have a dN/dS ratio (omega) when using NY98 model\n\n");
+						exit(0);
+					}
+					if (GetDoubleParams(argc, argv, &i, P, 1, &omega)) {
+						fprintf(stderr, "Bad dN/dS Ratio (omega): %s\n\n", argv[i]);
 						exit(0);
 					}
 				break;
@@ -518,7 +558,7 @@ void PrintVerbose(FILE *fv)
 		fprintf(fv, "    proportion invariable = %f\n", proportionInvariable);
 	}
 	fprintf(fv, "Model = %s\n", modelTitles[model]);
-	if (isNucModel) {
+	if (isNucModel==1) {
 		if (equalTstv) {
 			fprintf(fv, "  Rate of transitions and transversions equal:\n");
 		}
@@ -538,7 +578,7 @@ void PrintVerbose(FILE *fv)
 			fprintf(fv, "  with nucleotide frequencies specified as:\n");
 			fprintf(fv, "  A=%G C=%G G=%G T=%G\n\n", freq[A], freq[C], freq[G], freq[T]);
 		}
-	} else {
+	} else if (isNucModel==0) {
 		if (aaFreqSet) {
 			if (equalFreqs) {
 				fprintf(fv, "  with amino acid frequencies equal.\n\n");
@@ -547,6 +587,23 @@ void PrintVerbose(FILE *fv)
 				fprintf(fv, "  ");
 				for (i = 0; i < NUM_AA; i++) {
 					fprintf(fv, " %c=%G", aminoAcids[i], freq[i]);
+				}
+				fprintf(fv, "\n\n");
+			}
+		}
+	} else {
+		if (model==NY98) {
+			fprintf(fv, "  transition/transversion ratio = %G \n", tstv);
+			fprintf(fv, "  dN/dS ratio (omega)           = %G \n", omega);
+		}
+		if (codFreqSet) {
+			if (equalFreqs) {
+				fprintf(fv, "  with codon frequencies equal.\n\n");
+			} else {
+				fprintf(fv, "  with codon frequencies specified as:\n");
+				fprintf(fv, "  ");
+				for (i = 0; i < NUM_COD; i++) {
+					fprintf(fv, " %d=%G", i, freq[i]);
 				}
 				fprintf(fv, "\n\n");
 			}
@@ -706,7 +763,7 @@ int main(int argc, char **argv)
 	if (!userSeed)
 		randomSeed = CreateSeed();
 		
-	SetSeed(randomSeed);
+	TwisterSetSeed(randomSeed);
 
 	if (!quiet)
  		PrintTitle();

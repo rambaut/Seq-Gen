@@ -42,14 +42,13 @@ int cmatby (complex a[], complex b[], complex c[], int n,int m,int k);
 int cmatout (FILE * fout, complex x[], int n, int m);
 int cmatinv( complex x[], int n, int m, double space[]);
 
-int abyx (double a, double x[], int n)
+/*int abyx (double a, double x[], int n)
 { int i; for (i=0; i<n; x[i]*=a,i++) ;  return(0); }
 int xtoy (double x[], double y[], int n)
 { int i; for (i=0; i<n; y[i]=x[i],i++) ;  return(0); }
 int matinv( double x[], int n, int m, double space[])
 {
-/* x[n*m]  ... m>=n
-*/
+// x[n*m]  ... m>=n
    register int i,j,k;
    int *irow=(int*) space;
    double ee=1.0e-20, t,t1,xmax;
@@ -84,7 +83,7 @@ int matinv( double x[], int n, int m, double space[])
       }
       for (j=0; j<m; j++)   x[i*m+j] *= t;
       x[i*m+i] = t;
-   }                            /* i  */
+   }                            // i  
    for (i=n-1; i>=0; i--) {
       if (irow[i] == i) continue;
       for (j=0; j<n; j++)  {
@@ -94,7 +93,7 @@ int matinv( double x[], int n, int m, double space[])
       }
    }
    return (0);
-}
+}*/
 
 /***********************************************************
 *  This eigen() works for eigenvalue/vector analysis

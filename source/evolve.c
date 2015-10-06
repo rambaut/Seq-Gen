@@ -71,6 +71,7 @@ short IsInvariable();
 void SetSequence(char *seq, char *source, int inFromSite, int inNumSites);
 void SetNucSequence(char *seq, char *source, int inFromSite, int inNumSites);
 void SetAASequence(char *seq, char *source, int inFromSite, int inNumSites);
+//NOT REQUIRED: void SetCodSequence(char *seq, char *source, int inFromSite, int inNumSites);
 void RandomSequence(char *seq, int inNumSites);
 void MutateSequence(char *seq, int inFromSite, int inNumSites, double len);
 void SetSiteRates(int inFromSite, int inNumSites, double inScale);
@@ -132,11 +133,11 @@ void SetCategories()
 		}
 	} else if (rateHetero==GammaRates) {
 		for (i=0; i<numSites; i++)
-			gammaRates[i]=rndgamma(gammaShape) / gammaShape;
+			gammaRates[i]=rndGamma(gammaShape) / gammaShape;
 	} else if (rateHetero==DiscreteGammaRates) {
 		DiscreteGamma(freqRate, catRate, gammaShape, gammaShape, numCats, 0);
 		for (i=0; i<numSites; i++)
-			categories[i]=(int)(rndu()*numCats);
+			categories[i]=(int)(Twisterrndu()*numCats);
 	}
 
 	if (invariableSites) {
@@ -151,7 +152,7 @@ char SetState(double *P)
 	char j;
 	double r;
 	
-	r=rndu();
+	r=Twisterrndu();
 	for (j=0; r>(*P) && j<numStates; j++) P++;
 	return j;
 }
@@ -160,7 +161,7 @@ short IsInvariable()
 {
 	double r;
 
-	r=rndu();
+	r=Twisterrndu();
 	if (r < proportionInvariable)
 		return 1;
 	else 
@@ -182,6 +183,10 @@ void RandomSequence(char *seq, int inNumSites)
 
 void SetSequence(char *seq, char *source, int inFromSite, int inNumSites)
 {
+	if(isNucModel==2) {
+		fprintf(stderr, "\nCannot set ancestral sequence for codon models\n\n");
+		exit(0);
+	}
 	int i, j;
 	char *P, *Q;
 	
@@ -432,7 +437,8 @@ void WritePhylipFormat(FILE *fv, TTree **treeSet, int *partitionLengths)
 	int i, j, k;
 	char *P;
 
-	fprintf(fv, " %d %d\n", numTaxa, numSites);
+	if(isNucModel==2) fprintf(fv, " %d %d\n", numTaxa, numSites*3);
+	else fprintf(fv, " %d %d\n", numTaxa, numSites);
 
 	for (i=0; i<numTaxa; i++) {
 		if (fileFormat == RelaxedFormat)
@@ -452,9 +458,18 @@ void WritePhylipFormat(FILE *fv, TTree **treeSet, int *partitionLengths)
 		}
 		for (k = 0; k < numPartitions; k++) {
 			P=treeSet[k]->tips[i]->sequence;
-			for (j=0; j<partitionLengths[k]; j++) {
-				fputc(stateCharacters[(int)*P], fv);
-				P++;
+			if(isNucModel==2) {
+				for(j=0; j<partitionLengths[k]; j++) {
+					fputc(stateCharacters[3*(int)*P], fv);
+					fputc(stateCharacters[3*(int)*P+1], fv);
+					fputc(stateCharacters[3*(int)*P+2], fv);
+					P++;
+				}
+			} else {
+				for (j=0; j<partitionLengths[k]; j++) {
+					fputc(stateCharacters[(int)*P], fv);
+					P++;
+				}
 			}
 		}
 		fputc('\n', fv);
@@ -475,8 +490,9 @@ void WriteNexusFormat(FILE *fv, int treeNo, int datasetNo, TTree **treeSet, int 
 	else
 		fprintf(fv, "Begin DATA;\n");
 		
-	fprintf(fv, "\tDimensions NTAX=%d NCHAR=%d;\n", numTaxa, numSites);
-	if (isNucModel) {
+	if(isNucModel==2) fprintf(fv, "\tDimensions NTAX=%d NCHAR=%d;\n", numTaxa, numSites*3);
+	else fprintf(fv, "\tDimensions NTAX=%d NCHAR=%d;\n", numTaxa, numSites);
+	if (isNucModel==1 || isNucModel==2) {
 		fprintf(fv, "\tFormat MISSING=? GAP=- DATATYPE=DNA;\n");
 	} else {
 		fprintf(fv, "\tFormat MISSING=? GAP=- DATATYPE=PROTEIN;\n");
@@ -500,9 +516,18 @@ void WriteNexusFormat(FILE *fv, int treeNo, int datasetNo, TTree **treeSet, int 
 		
 		for (k = 0; k < numPartitions; k++) {
 			P=treeSet[k]->tips[i]->sequence;
-			for (j=0; j<partitionLengths[k]; j++) {
-				fputc(stateCharacters[(int)*P], fv);
-				P++;
+			if(isNucModel==2) {
+				for(j=0; j<partitionLengths[k]; j++) {
+					fputc(stateCharacters[3*(int)*P], fv);
+					fputc(stateCharacters[3*(int)*P+1], fv);
+					fputc(stateCharacters[3*(int)*P+2], fv);
+					P++;
+				}
+			} else {
+				for (j=0; j<partitionLengths[k]; j++) {
+					fputc(stateCharacters[(int)*P], fv);
+					P++;
+				}
 			}
 		}
 		fputc('\n', fv);
@@ -519,15 +544,25 @@ void WriteAncestralSequences(FILE *fv, TTree *tree)
 		n = (2 * numTaxa) - 3;
 	else
 		n = (2 * numTaxa) - 2;
-	fprintf(fv, " %d %d\n", n, numSites);
+	if(isNucModel==2) fprintf(fv, " %d %d\n", n, numSites*3);
+	else fprintf(fv, " %d %d\n", n, numSites);
 
 	n = numTaxa + 1;
 	
 	fprintf(fv, "%d\t", n);
 	P=tree->root->sequence;
-	for (j=0; j<numSites; j++) {
-		fputc(stateCharacters[(int)*P], fv);
-		P++;
+	if(isNucModel==2) {
+		for(j=0; j<numSites; j++) {
+			fputc(stateCharacters[3*(int)*P], fv);
+			fputc(stateCharacters[3*(int)*P+1], fv);
+			fputc(stateCharacters[3*(int)*P+2], fv);
+			P++;
+		}
+	} else {
+		for (j=0; j<numSites; j++) {
+			fputc(stateCharacters[(int)*P], fv);
+			P++;
+		}
 	}
 	fputc('\n', fv);
 	
@@ -546,9 +581,18 @@ void WriteAncestralSequencesNode(FILE *fv, TTree *tree, int *nodeNo, TNode *des)
 		(*nodeNo)++;
 		
 		fprintf(fv, "%d\t", *nodeNo);
-		for (j=0; j<numSites; j++) {
-			fputc(stateCharacters[(int)*P], fv);
-			P++;
+		if(isNucModel==2) {
+			for(j=0; j<numSites; j++) {
+				fputc(stateCharacters[3*(int)*P], fv);
+				fputc(stateCharacters[3*(int)*P+1], fv);
+				fputc(stateCharacters[3*(int)*P+2], fv);
+				P++;
+			}
+		} else {
+			for (j=0; j<numSites; j++) {
+				fputc(stateCharacters[(int)*P], fv);
+				P++;
+			}
 		}
 		fputc('\n', fv);
 		
@@ -556,9 +600,18 @@ void WriteAncestralSequencesNode(FILE *fv, TTree *tree, int *nodeNo, TNode *des)
 		WriteAncestralSequencesNode(fv, tree, nodeNo, des->branch2);
 	} else {
 		fprintf(fv, "%s\t", tree->names[des->tipNo]);
-		for (j=0; j<numSites; j++) {
-			fputc(stateCharacters[(int)*P], fv);
-			P++;
+		if(isNucModel==2) {
+			for(j=0; j<numSites; j++) {
+				fputc(stateCharacters[3*(int)*P], fv);
+				fputc(stateCharacters[3*(int)*P+1], fv);
+				fputc(stateCharacters[3*(int)*P+2], fv);
+				P++;
+			}
+		} else {
+			for (j=0; j<numSites; j++) {
+				fputc(stateCharacters[(int)*P], fv);
+				P++;
+			}
 		}
 		fputc('\n', fv);
 	}

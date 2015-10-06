@@ -41,7 +41,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
-#include "eigen.h"
+#include "paml.h"
 #include "aamodels.h"
 
 char *aminoAcids="ARNDCQEGHILKMFPSTWYV";

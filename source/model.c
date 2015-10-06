@@ -45,6 +45,7 @@
 #include "model.h"
 #include "nucmodels.h"
 #include "aamodels.h"
+#include "codmodels.h"
 
 char *modelNames[numModels]={
 	"HKY",
@@ -56,7 +57,8 @@ char *modelNames[numModels]={
 	"BLOSUM",
 	"MTREV",
 	"CPREV",
-	"GENERAL"
+	"GENERAL",
+	"NY98"
 };
 
 char *modelTitles[numModels]={
@@ -69,7 +71,8 @@ char *modelTitles[numModels]={
 	"BLOSUM62: Henikoff & Henikoff (1992) PNAS USA 89:10915-10919",
 	"MTREV24: Adachi & Hasegawa (1996) J Mol Evol 42:459-468",
 	"CPREV45: Adachi et al. (2000) J Mol Evol 50:348-358",
-	"GENERAL: General time reversible (amino acids)"
+	"GENERAL: General time reversible (amino acids)",
+	"NY98: Nielsen and Yang (1998)"
 };
 
 int model, numStates, isNucModel, userFreqs, equalFreqs;
@@ -95,7 +98,7 @@ void SetModel(int theModel)
 	
 	model=theModel;
 
-	if (isNucModel) {
+	if (isNucModel==1) {
 		numStates = NUM_NUC;
 		
 		SetNucModel(theModel);
@@ -103,7 +106,7 @@ void SetModel(int theModel)
 		freq = nucFreq;
 		addFreq = nucAddFreq;
 		stateCharacters = nucleotides;
-	} else {
+	} else if(isNucModel==0) {
 		numStates = NUM_AA;
 		
 		SetAAModel(theModel - numNucModels);
@@ -111,6 +114,14 @@ void SetModel(int theModel)
 		freq = aaFreq;
 		addFreq = aaAddFreq;
 		stateCharacters = aminoAcids;
+	} else {
+		numStates = NUM_COD;
+		
+		SetCodModel(theModel - numNucModels - numAAModels);
+		
+		freq = codFreq;
+		addFreq = codAddFreq;
+		stateCharacters = codons;
 	}
 	
 	addFreq[0]=freq[0];
@@ -122,19 +133,23 @@ void SetModel(int theModel)
 
 void SetMatrix(double *matrix, double len)
 {
-	if (isNucModel) {
+	if (isNucModel==1) {
 		SetNucMatrix(matrix, len);
-	} else {
+	} else if(isNucModel==0) {
 		SetAAMatrix(matrix, len);
+	} else {
+		SetCodMatrix(matrix, len);
 	}
 }
 
 void SetVector(double *vector, short state, double len)
 {
-	if (isNucModel) {
+	if (isNucModel==1) {
 		SetNucVector(vector, state, len);
-	} else {
+	} else if(isNucModel==0) {
 		SetAAVector(vector, state, len);
+	} else {
+		SetCodVector(vector, state, len);
 	}
 }
 

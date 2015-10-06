@@ -16,8 +16,8 @@
 #ifndef _GAMMA_H_
 #define _GAMMA_H_
 
-double rndgamma (double s);
-int DiscreteGamma (double freqK[], double rK[], double alfa, double beta, int K, int median);
+double rndGamma (double s);
+int discreteGamma (double freqK[], double rK[], double alfa, double beta, int K, int median);
 
 #endif /* _GAMMA_H_ */
 
