@@ -76,6 +76,7 @@ void MutateSequence(char *seq, int inFromSite, int inNumSites, double len);
 void SetSiteRates(int inFromSite, int inNumSites, double inScale);
 void EvolveNode(TNode *anc, TNode *des, int inFromSite, int inNumSites, double scale);
 
+void WriteFastaFormat(FILE *fv, TTree **treeSet, int *partitionLengths);
 void WritePhylipFormat(FILE *fv, TTree **treeSet, int *partitionLengths);
 void WriteNexusFormat(FILE *fv, int treeNo, int datasetNo, TTree **treeSet, int *partitionLengths);
 
@@ -424,6 +425,9 @@ void WriteSequences(FILE *fv, int treeNo, int datasetNo, TTree **treeSet, int *p
 		case NEXUSFormat:
 			WriteNexusFormat(fv, treeNo, datasetNo, treeSet, partitionLengths);
 		break;
+		case FASTAFormat:
+			WriteFastaFormat(fv, treeSet, partitionLengths);
+		break;
 	}
 }
 
@@ -458,6 +462,32 @@ void WritePhylipFormat(FILE *fv, TTree **treeSet, int *partitionLengths)
 			}
 		}
 		fputc('\n', fv);
+	}
+}
+
+void WriteFastaFormat(FILE *fv, TTree **treeSet, int *partitionLengths)
+{
+	size_t i, j, k;
+
+	for (i=0; i<numTaxa; i++) {
+		size_t printedSites = 0;
+
+		fprintf(fv, ">%s\n", treeSet[0]->names[i]);
+
+		for (j = 0; j < numPartitions; j++) {
+			char *P;
+			P=treeSet[j]->tips[i]->sequence;
+			for (k=0; k<partitionLengths[j]; k++) {
+				fputc(stateCharacters[(int)*P], fv);
+				P++;
+				if (++printedSites % 72 == 0) {
+					fputc('\n', fv);
+				}
+			}
+		}
+		if (printedSites % 72 != 0) {
+			fputc('\n', fv);
+		}
 	}
 }
 
