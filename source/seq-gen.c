@@ -128,6 +128,7 @@ static void PrintUsage()
 	fprintf(stderr, "    p PHYLIP format\n");
 	fprintf(stderr, "    r relaxed PHYLIP format\n");
 	fprintf(stderr, "    n NEXUS format\n");
+	fprintf(stderr, "    f FASTA format\n");
 	fprintf(stderr, "  -w: Write additional information [default = none]\n");
 	fprintf(stderr, "    a Write ancestral sequences for each node\n");
 	fprintf(stderr, "    r Write rate for each site\n");
@@ -447,6 +448,7 @@ void ReadParams(int argc, char **argv)
 						case 'P': fileFormat=PHYLIPFormat; break;
 						case 'R': fileFormat=RelaxedFormat; break;
 						case 'N': fileFormat=NEXUSFormat; break;
+						case 'F': fileFormat=FASTAFormat; break;
 						default:					
 							fprintf(stderr, "Unknown output format: %s\n\n", argv[i]);
 							PrintUsage();

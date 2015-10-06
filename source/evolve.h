@@ -63,7 +63,8 @@ enum {
 enum {
 	PHYLIPFormat,
 	RelaxedFormat,
-	NEXUSFormat
+	NEXUSFormat,
+	FASTAFormat
 };
 
 /* prototypes */
