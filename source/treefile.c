@@ -313,7 +313,7 @@ TNode *ReadTip(FILE *fv, char ch, TTree *tree, int numNames, char **names)
 	}
 	*P='\0';
 
-	CheckCapacity(tree, tree->numTips);
+	CheckCapacity(tree, tree->numTips+1);
 	
 	if (numNames == 0) {
 		node->tipNo=tree->numTips;
