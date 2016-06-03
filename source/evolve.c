@@ -146,6 +146,11 @@ void SetCategories()
 	} 
 }
 
+/*
+Changed "j<numStates" to "j<numStates-1" in the following function to prevent array overflow
+
+20 October 2011 -- Michael Ott, CSIRO (michael.ott@csiro.au)
+*/
 
 char SetState(double *P)
 {
@@ -153,7 +158,7 @@ char SetState(double *P)
 	double r;
 	
 	r=rndu();
-	for (j=0; r>(*P) && j<numStates; j++) P++;
+	for (j=0; r>(*P) && j<numStates-1; j++) P++;
 	return j;
 }
 
