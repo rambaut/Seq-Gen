@@ -127,6 +127,7 @@ TTree *NewTree()
 		strcpy(treeErrorMsg, "Out of memory creating tree.");
 		return NULL;
 	}
+	memset(tree, 0, sizeof(TTree)); /* grj */
 	tree->capacity=0;
 	CheckCapacity(tree, 1000);
 	
@@ -161,8 +162,8 @@ void CheckCapacity(TTree *tree, int required)
 		newTips[i] = NULL;
 	}
 	
-	free(tree->names);
-	free(tree->tips);
+	if (tree->names) { free(tree->names); tree->names=0; } /* grj */
+	if (tree->tips) { free(tree->tips); tree->tips = 0; } /* grj */
 	
 	tree->names = newNames;
 	tree->tips = newTips;
