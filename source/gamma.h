@@ -1,16 +1,16 @@
 /*  Header file for gamma.c                                */
 
 /*  
-   Sequence Generator - seq-gen, version 1.3.2
+   Sequence Generator - seq-gen, version 1.3.3
    Andrew Rambaut & Nick Grassly
-   Department of Zoology, University of Oxford			
-	
+   Institute of Evolutionary Biology, University of Edinburgh			
+
    The code in this file is taken from Ziheng Yang's PAML package.
    http://abacus.gene.ucl.ac.uk/
 
    Any feedback is very welcome.
-   http://evolve.zoo.ox.ac.uk/software/Seq-Gen/
-   email: andrew.rambaut@zoo.ox.ac.uk
+   http://tree.bio.ed.ac.uk/software/seqgen/
+   email: a.rambaut@ed.ac.uk
 */
 
 #ifndef _GAMMA_H_
