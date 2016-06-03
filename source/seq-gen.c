@@ -95,7 +95,7 @@ static void PrintTitle()
 static void PrintUsage()
 { 
 	fprintf(stderr, "Usage: seq-gen [-m MODEL] [-l #] [-n #] [-p #] [-s # | -d #] [-k #]\n");
-	fprintf(stderr, "               [-c #1 #2 #3 | -a # [-g #]] [-f e | #] [-t # | -r #]\n");
+	fprintf(stderr, "               [-c #1 #2 #3 | -a # [-g #]] [-i #] [-f e | #] [-t # | -r #]\n");
 	fprintf(stderr, "               [-z #] [-o[p][r][n]] [-w[a][r]] [-x NAME] [-q] [-h] [treefile]\n");
 	fprintf(stderr, "  -l: # = sequence length [default = 1000].\n");
 	fprintf(stderr, "  -n: # = simulated datasets per tree [default = 1].\n");
@@ -105,7 +105,7 @@ static void PrintUsage()
 	fprintf(stderr, "  -k: # = use sequence k as ancestral (needs alignment) [default = random].\n");
 
 	fprintf(stderr, "\n Substitution model options:\n");
-	fprintf(stderr, "  -m: MODEL = HKY, F84, GTR, JTT, WAG, PAM, BLOSUM, MTREV, GENERAL\n");
+	fprintf(stderr, "  -m: MODEL = HKY, F84, GTR, JTT, WAG, PAM, BLOSUM, MTREV, CPREV45, MTART, GENERAL\n");
 	fprintf(stderr, "      HKY, F84 & GTR are for nucleotides the rest are for amino acids\n");
 	fprintf(stderr, "  -a: # = shape (alpha) for gamma rate heterogeneity [default = none].\n");
 	fprintf(stderr, "  -g: # = number of gamma rate categories [default = continuous].\n");

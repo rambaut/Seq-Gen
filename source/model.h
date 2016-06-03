@@ -44,7 +44,7 @@
 
 extern char *stateCharacters;
 
-enum { NONE=-1, F84, HKY, GTR, JTT, WAG, PAM, BLOSUM, MTREV, CPREV, GENERAL, numModels };
+enum { NONE=-1, F84, HKY, GTR, JTT, WAG, PAM, BLOSUM, MTREV, CPREV, MTART, GENERAL, numModels };
 
 extern char *modelNames[numModels];
 extern char *modelTitles[numModels];
