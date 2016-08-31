@@ -1,7 +1,7 @@
 /*  
-   Sequence Generator - seq-gen, version 1.3.2
-   Copyright (c)1996-2004, Andrew Rambaut & Nick Grassly
-   Department of Zoology, University of Oxford			
+   Sequence Generator - seq-gen, version 1.3.3
+   Copyright (c)1996-2011, Andrew Rambaut & Nick Grassly
+   Institute of Evolutionary Biology, University of Edinburgh			
    All rights reserved.                          
 
    Redistribution and use in source and binary forms, with or without
@@ -33,8 +33,8 @@
 
 
    Any feedback is very welcome.
-   http://evolve.zoo.ox.ac.uk/software/Seq-Gen/
-   email: andrew.rambaut@zoo.ox.ac.uk
+   http://tree.bio.ed.ac.uk/software/seqgen/
+   email: a.rambaut@ed.ac.uk
 */
 
 #include <stdio.h>
@@ -56,6 +56,8 @@ char *modelNames[numModels]={
 	"BLOSUM",
 	"MTREV",
 	"CPREV",
+	"MTART",
+	"LG",
 	"GENERAL"
 };
 
@@ -69,6 +71,8 @@ char *modelTitles[numModels]={
 	"BLOSUM62: Henikoff & Henikoff (1992) PNAS USA 89:10915-10919",
 	"MTREV24: Adachi & Hasegawa (1996) J Mol Evol 42:459-468",
 	"CPREV45: Adachi et al. (2000) J Mol Evol 50:348-358",
+	"MTART: Abascal et al. (2007) Mol Biol Evol 24:1-5",
+	"LG: Le & Gascuel (2008) Mol Biol Evol 25:1307-1320",
 	"GENERAL: General time reversible (amino acids)"
 };
 

@@ -1,7 +1,7 @@
 /*  
-   Sequence Generator - seq-gen, version 1.3.2
-   Copyright (c)1996-2004, Andrew Rambaut & Nick Grassly
-   Department of Zoology, University of Oxford			
+   Sequence Generator - seq-gen, version 1.3.3
+   Copyright (c)1996-2011, Andrew Rambaut & Nick Grassly
+   Institute of Evolutionary Biology, University of Edinburgh			
    All rights reserved.                          
 
    Redistribution and use in source and binary forms, with or without
@@ -33,8 +33,8 @@
 
 
    Any feedback is very welcome.
-   http://evolve.zoo.ox.ac.uk/software/Seq-Gen/
-   email: andrew.rambaut@zoo.ox.ac.uk
+   http://tree.bio.ed.ac.uk/software/seqgen/
+   email: a.rambaut@ed.ac.uk
 */
 
 #include <stdio.h>
@@ -127,6 +127,7 @@ TTree *NewTree()
 		strcpy(treeErrorMsg, "Out of memory creating tree.");
 		return NULL;
 	}
+	memset(tree, 0, sizeof(TTree)); /* grj */
 	tree->capacity=0;
 	CheckCapacity(tree, 1000);
 	
@@ -161,8 +162,8 @@ void CheckCapacity(TTree *tree, int required)
 		newTips[i] = NULL;
 	}
 	
-	free(tree->names);
-	free(tree->tips);
+	if (tree->names) { free(tree->names); tree->names=0; } /* grj */
+	if (tree->tips) { free(tree->tips); tree->tips = 0; } /* grj */
 	
 	tree->names = newNames;
 	tree->tips = newTips;

@@ -1,9 +1,9 @@
 /*  Header file for model.c                                */
 
 /*  
-   Sequence Generator - seq-gen, version 1.3.2
-   Copyright (c)1996-2004, Andrew Rambaut & Nick Grassly
-   Department of Zoology, University of Oxford			
+   Sequence Generator - seq-gen, version 1.3.3
+   Copyright (c)1996-2011, Andrew Rambaut & Nick Grassly
+   Institute of Evolutionary Biology, University of Edinburgh			
    All rights reserved.                          
 
    Redistribution and use in source and binary forms, with or without
@@ -35,8 +35,8 @@
 
 
    Any feedback is very welcome.
-   http://evolve.zoo.ox.ac.uk/software/Seq-Gen/
-   email: andrew.rambaut@zoo.ox.ac.uk
+   http://tree.bio.ed.ac.uk/software/seqgen/
+   email: a.rambaut@ed.ac.uk
 */
 
 #ifndef _MODEL_H_
@@ -44,7 +44,7 @@
 
 extern char *stateCharacters;
 
-enum { NONE=-1, F84, HKY, GTR, JTT, WAG, PAM, BLOSUM, MTREV, CPREV, GENERAL, numModels };
+enum { NONE=-1, F84, HKY, GTR, JTT, WAG, PAM, BLOSUM, MTREV, CPREV, MTART, LG, GENERAL, numModels };
 
 extern char *modelNames[numModels];
 extern char *modelTitles[numModels];

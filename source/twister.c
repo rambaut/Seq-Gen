@@ -1,14 +1,14 @@
 /*  
-   Sequence Generator - seq-gen, version 1.3.2
-   Andrew Rambaut & Nick Grassly
-   Department of Zoology, University of Oxford			
+   Sequence Generator - seq-gen, version 1.3.3
+   1996-2011, Andrew Rambaut & Nick Grassly
+   Institute of Evolutionary Biology, University of Edinburgh			
 	
    The code in this file is covered by the license and copyright message
    given below.
-   
+
    Any feedback is very welcome.
-   http://evolve.zoo.ox.ac.uk/software/Seq-Gen/
-   email: andrew.rambaut@zoo.ox.ac.uk
+   http://tree.bio.ed.ac.uk/software/seqgen/
+   email: a.rambaut@ed.ac.uk
 */
 
 /* 

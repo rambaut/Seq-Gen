@@ -1,7 +1,7 @@
 /*  
-   Sequence Generator - seq-gen, version 1.3.2
-   Copyright (c)1996-2004, Andrew Rambaut & Nick Grassly
-   Department of Zoology, University of Oxford			
+   Sequence Generator - seq-gen, version 1.3.3
+   Copyright (c)1996-2011, Andrew Rambaut & Nick Grassly
+   Institute of Evolutionary Biology, University of Edinburgh			
    All rights reserved.                          
 
    Redistribution and use in source and binary forms, with or without
@@ -33,8 +33,8 @@
 
 
    Any feedback is very welcome.
-   http://evolve.zoo.ox.ac.uk/software/Seq-Gen/
-   email: andrew.rambaut@zoo.ox.ac.uk
+   http://tree.bio.ed.ac.uk/software/seqgen/
+   email: a.rambaut@ed.ac.uk
 */
 
 #include <stdio.h>
@@ -54,7 +54,7 @@
 #include "twister.h"
 
 #define PROGRAM_NAME "seq-gen"
-#define VERSION_NUMBER "Version 1.3.2"
+#define VERSION_NUMBER "Version 1.3.2x"
 
 int treeFile, textFile, numDatasets, numTrees;
 int scaleTrees, scaleBranches, ancestorSeq, writeAncestors, writeRates;
@@ -95,7 +95,7 @@ static void PrintTitle()
 static void PrintUsage()
 { 
 	fprintf(stderr, "Usage: seq-gen [-m MODEL] [-l #] [-n #] [-p #] [-s # | -d #] [-k #]\n");
-	fprintf(stderr, "               [-c #1 #2 #3 | -a # [-g #]] [-f e | #] [-t # | -r #]\n");
+	fprintf(stderr, "               [-c #1 #2 #3 | -a # [-g #]] [-i #] [-f e | #] [-t # | -r #]\n");
 	fprintf(stderr, "               [-z #] [-o[p][r][n]] [-w[a][r]] [-x NAME] [-q] [-h] [treefile]\n");
 	fprintf(stderr, "  -l: # = sequence length [default = 1000].\n");
 	fprintf(stderr, "  -n: # = simulated datasets per tree [default = 1].\n");
@@ -105,7 +105,7 @@ static void PrintUsage()
 	fprintf(stderr, "  -k: # = use sequence k as ancestral (needs alignment) [default = random].\n");
 
 	fprintf(stderr, "\n Substitution model options:\n");
-	fprintf(stderr, "  -m: MODEL = HKY, F84, GTR, JTT, WAG, PAM, BLOSUM, MTREV, GENERAL\n");
+	fprintf(stderr, "  -m: MODEL = HKY, F84, GTR, JTT, WAG, PAM, BLOSUM, MTREV, CPREV45, MTART, LG, GENERAL\n");
 	fprintf(stderr, "      HKY, F84 & GTR are for nucleotides the rest are for amino acids\n");
 	fprintf(stderr, "  -a: # = shape (alpha) for gamma rate heterogeneity [default = none].\n");
 	fprintf(stderr, "  -g: # = number of gamma rate categories [default = continuous].\n");

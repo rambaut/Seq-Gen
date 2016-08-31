@@ -1,7 +1,7 @@
 /*  
-   Sequence Generator - seq-gen, version 1.3.2
-   Copyright (c)1996-2004, Andrew Rambaut & Nick Grassly
-   Department of Zoology, University of Oxford			
+   Sequence Generator - seq-gen, version 1.3.3
+   Copyright (c)1996-2011, Andrew Rambaut & Nick Grassly
+   Institute of Evolutionary Biology, University of Edinburgh			
    All rights reserved.                          
 
    Redistribution and use in source and binary forms, with or without
@@ -33,8 +33,8 @@
 
 
    Any feedback is very welcome.
-   http://evolve.zoo.ox.ac.uk/software/Seq-Gen/
-   email: andrew.rambaut@zoo.ox.ac.uk
+   http://tree.bio.ed.ac.uk/software/seqgen/
+   email: a.rambaut@ed.ac.uk
 */
  
 #include <stdio.h>
@@ -120,6 +120,35 @@ static double wagRelativeRates[NUM_AA_REL_RATES] = {
 
 static double wagFrequencies[NUM_AA] = {
 	0.0866, 0.0440, 0.0391, 0.0570, 0.0193, 0.0367, 0.0581, 0.0833, 0.0244, 0.0485, 0.0862, 0.0620, 0.0195, 0.0384, 0.0458, 0.0695, 0.0610, 0.0144, 0.0353, 0.0709
+};
+
+/* LG model of amino acid evolution */
+/* Le, S. and Gascuel, O. (2008) An improved Amino Acid Replacement Matrix */
+/* Mol. Biol. Evol. 25(7):1307-1320. */
+static double lgRelativeRates[NUM_AA_REL_RATES] = {
+	0.425093, 0.276818, 0.395144, 2.489084, 0.969894, 1.038545, 2.066040, 0.358858, 0.149830, 0.395337, 0.536518, 1.124035, 0.253701, 1.177651, 4.727182, 2.139501, 0.180717, 0.218959, 2.547870,
+	0.751878, 0.123954, 0.534551, 2.807908, 0.363970, 0.390192, 2.426601, 0.126991, 0.301848, 6.326067, 0.484133, 0.052722, 0.332533, 0.858151, 0.578987, 0.593607, 0.314440, 0.170887,
+	5.076149, 0.528768, 1.695752, 0.541712, 1.437645, 4.509238, 0.191503, 0.068427, 2.145078, 0.371004, 0.089525, 0.161787, 4.008358, 2.000679, 0.045376, 0.612025, 0.083688,
+	0.062556, 0.523386, 5.243870, 0.844926, 0.927114, 0.010690, 0.015076, 0.282959, 0.025548, 0.017416, 0.394456, 1.240275, 0.425860, 0.029890, 0.135107, 0.037967,
+	0.084808, 0.003499, 0.569265, 0.640543, 0.320627, 0.594007, 0.013266, 0.893680, 1.105251, 0.075382, 2.784478, 1.143480, 0.670128, 1.165532, 1.959291,
+	4.128591, 0.267959, 4.813505, 0.072854, 0.582457, 3.234294, 1.672569, 0.035855, 0.624294, 1.223828, 1.080136, 0.236199, 0.257336, 0.210332,
+	0.348847, 0.423881, 0.044265, 0.069673, 1.807177, 0.173735, 0.018811, 0.419409, 0.611973, 0.604545, 0.077852, 0.120037, 0.245034,
+	0.311484, 0.008705, 0.044261, 0.296636, 0.139538, 0.089586, 0.196961, 1.739990, 0.129836, 0.268491, 0.054679, 0.076701,
+	0.108882, 0.366317, 0.697264, 0.442472, 0.682139, 0.508851, 0.990012, 0.584262, 0.597054, 5.306834, 0.119013,
+	4.145067, 0.159069, 4.273607, 1.112727, 0.078281, 0.064105, 1.033739, 0.111660, 0.232523, 10.649107,
+	0.137500, 6.312358, 2.592692, 0.249060, 0.182287, 0.302936, 0.619632, 0.299648, 1.702745,
+	0.656604, 0.023918, 0.390322, 0.748683, 1.136863, 0.049906, 0.131932, 0.185202,
+	1.798853, 0.099849, 0.346960, 2.020366, 0.696175, 0.481306, 1.898718,
+	0.094464, 0.361819, 0.165001, 2.457121, 7.803902, 0.654683,
+	1.338132, 0.571468, 0.095131, 0.089613, 0.296501,
+	6.472279, 0.248862, 0.400547, 0.098369,
+	0.140825, 0.245841, 2.188158,
+	3.151815, 0.189510,
+	0.249313
+};
+
+static double lgFrequencies[NUM_AA] = {
+  0.079066, 0.055941, 0.041977, 0.053052, 0.012937, 0.040767, 0.071586, 0.057337, 0.022355, 0.062157, 0.099081, 0.064600, 0.022951, 0.042302, 0.044040, 0.061197, 0.053287, 0.012066, 0.034155, 0.069147
 };
 
 /* Dayhoff, M.O., Schwartz, R.M., Orcutt, B.C. (1978)*/
@@ -236,11 +265,50 @@ static double cprevFrequencies[NUM_AA] = {
 	0.076, 0.062, 0.041, 0.037, 0.009, 0.038, 0.049, 0.084, 0.025, 0.081, 0.101, 0.050, 0.022, 0.051, 0.043, 0.062, 0.054, 0.018, 0.031, 0.066
 };
 
+/*
+MtArt model inserted in following
+
+7 Oct 2011 -- Lars Jermiin (lars.jermiin@csiro.au)
+*/
+
+/* MtArt: A New Model of Amino Acid Replacement for Arthropoda */
+/* Abascal, F., Posada, D., and Zardoya, R. 2007. Mol. Biol. Evol. 24:1-5. */
+static double mtartRelativeRates[NUM_AA_REL_RATES] = {
+	0.19, 0.19, 0.59, 253.51, 0.19, 0.19, 199.84, 0.19, 25.69, 3.70, 0.19, 120.64, 13.10, 49.33, 672.97, 243.93, 0.19, 1.18, 339.91,
+	0.19, 4.28, 35.51, 153.97, 0.19, 0.19, 41.30, 1.81, 1.77, 208.60, 5.18, 4.73, 0.19, 2.66, 0.19, 0.19, 3.88, 0.19,
+	500.16, 98.18, 261.79, 183.04, 120.53, 179.54, 21.33, 12.65, 467.34, 78.81, 19.72, 16.54, 398.43, 165.89, 7.73, 251.17, 22.60,
+	10.61, 0.19, 861.83, 12.46, 0.19, 6.60, 1.17, 1.68, 0.19, 0.19, 0.19, 44.35, 0.19, 0.19, 0.19, 0.19,
+	0.19, 0.19, 80.53, 12.37, 63.00, 78.71, 0.19, 312.30, 184.06, 0.19, 664.16, 182.80, 21.61, 71.99, 350.40,
+	261.55, 2.64, 313.50, 10.54, 16.28, 349.28, 67.33, 0.19, 39.30, 52.36, 43.68, 6.68, 86.67, 0.19,
+	43.86, 15.25, 6.81, 1.72, 106.31, 0.19, 0.19, 7.88, 31.50, 43.40, 10.99, 7.74, 13.63,
+	0.19, 2.74, 1.36, 0.19, 55.71, 0.83, 0.19, 226.03, 0.19, 1.88, 8.65, 2.56,
+	0.19, 5.54, 0.19, 0.19, 13.78, 0.79, 10.62, 18.59, 0.19, 191.43, 0.19,
+	514.54, 3.46, 514.78, 117.91, 0.19, 7.15, 203.74, 0.19, 12.33, 1854.52,
+	3.78, 885.50, 262.57, 12.17, 8.17, 47.75, 21.13, 19.76, 84.72,
+	105.61, 10.73, 16.82, 144.22, 69.54, 15.97, 117.09, 26.06,
+	321.61, 5.26, 111.74, 288.57, 70.68, 70.92, 281.29,
+	14.62, 36.05, 13.54, 53.67, 791.56, 51.90,
+	86.50, 46.83, 0.19, 18.39, 31.70,
+	660.39, 2.38, 30.45, 60.59,
+	0.19, 45.98, 544.14,
+	37.72, 0.19,
+	1.59
+};
+
+static double mtartFrequencies[NUM_AA] = {
+	0.054116, 0.018227, 0.039903, 0.020160, 0.009709, 0.018781, 0.024289, 0.068183, 0.024518, 0.092639, 0.148658, 0.021718, 0.061453, 0.088668, 0.041826, 0.091030, 0.049194, 0.029786, 0.039443, 0.057701
+};
+
 /*************************************/
 void SetAAModel(int theAAModel)
 {	
 	aaModel = theAAModel;
 	
+/*
+"AA_MTART" inserted in position 6 of the following switch
+ 
+7 Oct 2011 -- Lars Jermiin (lars.jermiin@csiro.au)
+*/
 	switch (aaModel) {
 		case AA_JTT: SetRelativeRates(jttRelativeRates); break;
 		case AA_WAG: SetRelativeRates(wagRelativeRates); break;
@@ -248,10 +316,18 @@ void SetAAModel(int theAAModel)
 		case AA_BLOSUM62: SetRelativeRates(blosumRelativeRates); break;
 		case AA_MTREV24: SetRelativeRates(mtrevRelativeRates); break;
 		case AA_CPREV45: SetRelativeRates(cprevRelativeRates); break;
+		case AA_MTART: SetRelativeRates(mtartRelativeRates); break;
+		case AA_LG: SetRelativeRates(lgRelativeRates); break;
 		case AA_GENERAL: 
 			// relative rates set by user
 		break;
 	}
+
+/*
+"AA_MTART" inserted in position 6 of the following switch
+ 
+7 Oct 2011 -- Lars Jermiin (lars.jermiin@csiro.au)
+*/
 		
 	if (!aaFreqSet) {
 		switch (aaModel) {
@@ -261,6 +337,8 @@ void SetAAModel(int theAAModel)
 			case AA_BLOSUM62: SetFrequencies(blosumFrequencies); break;
 			case AA_MTREV24: SetFrequencies(mtrevFrequencies); break;
 			case AA_CPREV45: SetFrequencies(cprevFrequencies); break;
+			case AA_MTART: SetFrequencies(mtartFrequencies); break;
+			case AA_LG: SetFrequencies(lgFrequencies); break;
 			case AA_GENERAL: 
 				// frequencies set by user
 			break;
