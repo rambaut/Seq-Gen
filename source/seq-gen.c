@@ -111,7 +111,7 @@ static void PrintUsage()
 	fprintf(stderr, "  -g: # = number of gamma rate categories [default = continuous].\n");
 	fprintf(stderr, "  -i: # = proportion of invariable sites [default = 0.0].\n");
 
-	fprintf(stderr, "\n Nucleotid model specific options:\n");
+	fprintf(stderr, "\n Nucleotide model specific options:\n");
 	fprintf(stderr, "  -c: #1 #2 #3 = rates for codon position heterogeneity [default = none].\n");
 	fprintf(stderr, "  -t: # = transition-transversion ratio [default = equal rate].\n");
 	fprintf(stderr, "  -r: #1 #2 #3 #4 #5 #6= general rate matrix [default = all 1.0].\n");
