@@ -1,6 +1,6 @@
 /*  
-   Sequence Generator - seq-gen, version 1.3.3
-   Copyright (c)1996-2011, Andrew Rambaut & Nick Grassly
+   Sequence Generator - seq-gen, version 1.3.4
+   Copyright (c)1996-2017, Andrew Rambaut & Nick Grassly
    Institute of Evolutionary Biology, University of Edinburgh			
    All rights reserved.                          
 
@@ -171,7 +171,7 @@ int GetUnsignedLongParams(int argc, char **argv, int *argn, char *pos, int numPa
 			if (st==NULL)
 				return -1;
 		}
-		
+	
 		if (sscanf(st, "%lu", params+i)!=1)
 			return -1;
 		i++;
@@ -188,7 +188,7 @@ int GetStrParam(int argc, char **argv, int *argn, char *pos, char *param, int le
 {
 	int i;
 	char *st, *P, buf[256];
-	
+		
 	i=0;
 	strcpy(buf, pos);
 	st=strtok(buf, "\t,/");
@@ -202,6 +202,7 @@ int GetStrParam(int argc, char **argv, int *argn, char *pos, char *param, int le
 		if (st==NULL)
 			return -1;
 	}
+
 	strncpy(param, st, len);
 	param[len]='\0';
 	P=param;

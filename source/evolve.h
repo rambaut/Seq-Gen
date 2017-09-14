@@ -1,8 +1,8 @@
 /*  Header file for evolve.c                               */
 
 /*  
-   Sequence Generator - seq-gen, version 1.3.3
-   Copyright (c)1996-2011, Andrew Rambaut & Nick Grassly
+   Sequence Generator - seq-gen, version 1.3.4
+   Copyright (c)1996-2017, Andrew Rambaut & Nick Grassly
    Institute of Evolutionary Biology, University of Edinburgh			
    All rights reserved.                          
 

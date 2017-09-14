@@ -1,6 +1,6 @@
 /*  
-   Sequence Generator - seq-gen, version 1.3.3
-   Copyright (c)1996-2011, Andrew Rambaut & Nick Grassly
+   Sequence Generator - seq-gen, version 1.3.4
+   Copyright (c)1996-2017, Andrew Rambaut & Nick Grassly
    Institute of Evolutionary Biology, University of Edinburgh			
    All rights reserved.                          
 
@@ -54,7 +54,7 @@
 #include "twister.h"
 
 #define PROGRAM_NAME "seq-gen"
-#define VERSION_NUMBER "Version 1.3.2x"
+#define VERSION_NUMBER "Version 1.3.4"
 
 int treeFile, textFile, numDatasets, numTrees;
 int scaleTrees, scaleBranches, ancestorSeq, writeAncestors, writeRates;
@@ -87,9 +87,10 @@ static void PrintTitle()
 {
 	fprintf(stderr, "Sequence Generator - %s\n", PROGRAM_NAME);
 	fprintf(stderr, "%s\n", VERSION_NUMBER);
-	fprintf(stderr, "(c) Copyright, 1996-2004 Andrew Rambaut and Nick Grassly\n");
-	fprintf(stderr, "Department of Zoology, University of Oxford\n");
-	fprintf(stderr, "South Parks Road, Oxford OX1 3PS, U.K.\n\n");
+	fprintf(stderr, "(c) Copyright, 1996-2017 Andrew Rambaut and Nick Grassly\n");
+	fprintf(stderr, "Institute of Evolutionary Biology, University of Edinburgh\n\n");
+	fprintf(stderr, "Originally developed at:\n");
+	fprintf(stderr, "Department of Zoology, University of Oxford\n\n");
 }
 
 static void PrintUsage()
@@ -210,7 +211,7 @@ void ReadParams(int argc, char **argv)
 						fprintf(stderr, "Bad (or missing) Model Code: %s\n\n", argv[i]);
 						exit(0);
 					}
-					
+
 					P=st;
 					while (*P) {
 						*P=toupper(*P);
@@ -496,6 +497,13 @@ void PrintVerbose(FILE *fv)
 
 	fputc('\n', fv);
 	
+	if (hasAlignment) {
+		fprintf(fv, "Alignment read: numSequences = %d, numAlignmentSites = %d\n", numSequences, numAlignmentSites);
+		if (ancestorSeq > 0) {
+			fprintf(fv, "Using sequence %d as the ancestral sequence\n", ancestorSeq);
+		}
+		fputc('\n', fv);
+	}
 	
 	if (scaleTrees) {
 		fprintf(fv, "Branch lengths of trees scaled so that tree is %G from root to tip\n\n", treeScale);
@@ -574,9 +582,9 @@ void ReadFileParams()
 			fprintf(stderr, "Unable to read parameters from standard input\n");
 			exit(0);
 		}
+
 		hasAlignment=1;
-	}
-		
+	}		
 }
 
 void AllocateMemory()
@@ -713,12 +721,12 @@ int main(int argc, char **argv)
 	if (!quiet)
  		PrintTitle();
 	
-	if (!treeFile) {
+	/* if (!treeFile) { */
 		ReadFileParams();
-	}
+	/*} */
 	
 	if ((ancestorSeq>0 && !hasAlignment) || ancestorSeq>numSequences) {
-		fprintf(stderr, "Bad ancestral sequence number\n");
+		fprintf(stderr, "Bad ancestral sequence number: %d (%d sequences loaded)\n", ancestorSeq, numSequences);
 		exit(0);
 	}
 	
@@ -739,7 +747,7 @@ int main(int argc, char **argv)
 			
 		if (ancestorSeq>0) {
 			if (numSites!=numAlignmentSites) {
-				fprintf(stderr, "Ancestral sequence is of a different length to the simulated sequences\n");
+				fprintf(stderr, "Ancestral sequence is of a different length to the simulated sequences (%d)\n", numAlignmentSites);
 				exit(0);
 			}
 			ancestor=sequences[ancestorSeq-1];
