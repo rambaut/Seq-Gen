@@ -386,7 +386,7 @@ TNode *ReadNode(FILE *fv, TTree *tree, int numNames, char **names, int detectPol
 		fprintf(stderr, "This tree contains nodes which aren't bifurcations. Resolve the node\n");
 		fprintf(stderr, "with zero branch lengths to obtain correct results. This can be done\n");
 		fprintf(stderr, "with a program called TreeEdit: http://evolve.zoo.ox.ac.uk/software/TreeEdit\n");
-		exit(0);
+		exit(4);
 	}
 
 	if (feof(fv)) {
@@ -475,7 +475,7 @@ void ReadTree(FILE *fv, TTree *tree, int treeNum, int numNames, char **names,
 	if (ch == '[') {
 		if (fscanf(fv, "%d", outNumSites)!=1) {
 			sprintf(treeErrorMsg, "Unable to read partition length");
-			exit(0);
+			exit(4);
 		}
 
 		ch=fgetc(fv);
@@ -485,7 +485,7 @@ void ReadTree(FILE *fv, TTree *tree, int treeNum, int numNames, char **names,
 		if (ch == ',') {
 			if (fscanf(fv, "%lf", outRelRate)!=1) {
 				sprintf(treeErrorMsg, "Unable to read partition relative rate");
-				exit(0);
+				exit(4);
 			}
 
 			ch=fgetc(fv);
@@ -496,7 +496,7 @@ void ReadTree(FILE *fv, TTree *tree, int treeNum, int numNames, char **names,
 	
 	if (ch!='(' || (tree->root=ReadNode(fv, tree, numNames, names, 0))==NULL) {
 		fprintf(stderr, "Error reading tree number %d: %s.\n", treeNum, treeErrorMsg);
-		exit(0);
+		exit(4);
 	}
 	
 	ch=fgetc(fv);
@@ -507,7 +507,7 @@ void ReadTree(FILE *fv, TTree *tree, int treeNum, int numNames, char **names,
 		tree->rooted=0;
 		if ((tree->root->branch0=ReadBranch(fv, tree, numNames, names))==NULL) {
 			fprintf(stderr, "Error reading tree number %d: %s.\n", treeNum, treeErrorMsg);
-			exit(0);
+			exit(4);
 		}
 		tree->root->branch0->branch0=tree->root;
 		tree->root->length0=tree->root->branch0->length0;
