@@ -142,8 +142,9 @@ static void PrintUsage()
 
 void ReadParams(int argc, char **argv)
 {
-	int i, j;
+	int i, j, k;
 	char ch, *P, st[4];
+	int modelTwoArgs = 0;
 	
 	model=NONE;
 
@@ -207,18 +208,16 @@ void ReadParams(int argc, char **argv)
 					exit(0);
 				break;
 				case 'M':
+					k = i;
 					if (GetStrParam(argc, argv, &i, P, st, 3)) {
 						fprintf(stderr, "Bad (or missing) Model Code: %s\n\n", argv[i]);
 						exit(1);
 					}
-
 					P=st;
-					while (*P) {
-						*P=toupper(*P);
-						P++;
+					if (i > k) {
+						modelTwoArgs = 1;
 					}
-					P=st;
-		
+								
 					model=-1;
 					for (j=F84; j<numModels; j++) {
 						if (strncmp(P, modelNames[j], 3)==0) {
@@ -281,6 +280,10 @@ void ReadParams(int argc, char **argv)
 				break;
 				case 'M':
 					// already delt with
+					if (modelTwoArgs) {
+						// the model took two arguments so skip the second one.
+						i++;
+					}
 				break;
 				case 'L':
 					if (GetIntParams(argc, argv, &i, P, 1, &numSites) || numSites<1) {
