@@ -573,21 +573,23 @@ void ReadFileParams()
 	
 	hasAlignment=0;
 	
-	ch=fgetc(stdin);
-	while (!feof(stdin) && isspace(ch)) 
-		ch=fgetc(stdin);
+	ch=fgetc(tree_fv);
+	while (!feof(tree_fv) && isspace(ch)) {
+		ch=fgetc(tree_fv);
+	}
 		
-	ungetc(ch, stdin);
+	ungetc(ch, tree_fv);
 
 	if (ch!='(' && isdigit(ch)) {
-		fgets(st, 255, stdin);
+		fgets(st, 255, tree_fv);
 		if ( sscanf( st, " %d %d", &numSequences, &numAlignmentSites)!=2 ) {
 			fprintf(stderr, "Unable to read parameters from standard input\n");
 			exit(2);
 		}
 
 		hasAlignment=1;
-		/* fprintf(stderr, "%d sequences, %d sites\n", numSequences, numAlignmentSites); */
+		
+//		fprintf(stderr, "%d sequences, %d sites\n", numSequences, numAlignmentSites);
 	}		
 }
 
@@ -611,20 +613,20 @@ void ReadFile()
 		
 	n=0;
 	do {
-		ch=fgetc(stdin);
-		while ( !feof(stdin) && isspace(ch)) {
-			ch=fgetc(stdin);
+		ch=fgetc(tree_fv);
+		while ( !feof(tree_fv) && isspace(ch)) {
+			ch=fgetc(tree_fv);
 		}
 			
-		if ( feof(stdin) ) {
+		if ( feof(tree_fv) ) {
 			fprintf(stderr, "Unexpected end of file on standard input\n"); 
 			exit(2);
 		}
-	
+			
 		i=0;
-		while ( i<MAX_NAME_LEN && !feof(stdin) && !isspace(ch) ) {
+		while ( i<MAX_NAME_LEN && !feof(tree_fv) && !isspace(ch) ) {
 			names[n][i]=ch;
-			ch=fgetc(stdin);
+			ch=fgetc(tree_fv);
 			i++;
 		}
 		names[n][i]='\0';
@@ -632,22 +634,22 @@ void ReadFile()
 			fprintf(stderr, "Name missing for species %d\n", n+1);
 			exit(2);
 		}
-		while (!feof(stdin) && isspace(ch)) {
-			ch=fgetc(stdin);
+		while (!feof(tree_fv) && isspace(ch)) {
+			ch=fgetc(tree_fv);
 		}
 		
-		if ( feof(stdin) ) {
+		if ( feof(tree_fv) ) {
 			fprintf(stderr, "Unexpected end of file on standard input\n");
 			exit(2);
 		}
 		
 		b=0;
-		while ( !feof(stdin) && b<numAlignmentSites) {
+		while ( !feof(tree_fv) && b<numAlignmentSites) {
 			if ( !isspace(ch) ) {
 				sequences[n][b]=ch;
 				b++;
 			}
-			ch=toupper(fgetc(stdin));
+			ch=toupper(fgetc(tree_fv));
 		}
 
 		if ( b<numAlignmentSites ) {
@@ -655,19 +657,20 @@ void ReadFile()
 			exit(2);
 		}
 		
-		/* fprintf(stderr, "%d: %s, bases read: %d, %s\n", n+1, names[n], b, sequences[n]); */
+//		fprintf(stderr, "%d: %s, bases read: %d, %s\n", n+1, names[n], b, sequences[n]); 
+
 		n++;
 		
-		if ( n<numSequences && feof(stdin) ) {
+		if ( n<numSequences && feof(tree_fv) ) {
 			fprintf(stderr, "Too few sequences in input file\n");
 			exit(2);
 		}
 	} while ( n<numSequences );
 	
-	while (!feof(stdin) && isspace(ch)) {
-		ch=fgetc(stdin);
+	while (!feof(tree_fv) && isspace(ch)) {
+		ch=fgetc(tree_fv);
 	}
-	ungetc(ch, stdin);
+	ungetc(ch, tree_fv);
 }
 
 int OpenTreeFile()
@@ -732,10 +735,13 @@ int main(int argc, char **argv)
 	if (!quiet)
  		PrintTitle();
 	
+	numTrees = OpenTreeFile();
+
 	/* if (!treeFile) { */
 		ReadFileParams();
 	/*} */
-	
+
+
 	if ((ancestorSeq>0 && !hasAlignment) || ancestorSeq>numSequences) {
 		fprintf(stderr, "Bad ancestral sequence number: %d (%d sequences loaded)\n", ancestorSeq, numSequences);
 		exit(4);
@@ -795,9 +801,7 @@ int main(int argc, char **argv)
 			exit(5);
 		}
 	}
-			
-	numTrees = OpenTreeFile();
-		
+					
 	CreateRates();
 	
 	treeNo=0;
