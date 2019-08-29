@@ -146,7 +146,8 @@ void CheckCapacity(TTree *tree, int required)
 	TNode **newTips;
 	
 	while (newCapacity < required) {
-		newCapacity += 1000;
+		// Hacky fix to avoid memory corruption
+		newCapacity = required * 2;
 	}
 	
 	newNames = (char**)CAllocMem(sizeof(char*)*newCapacity, "newNames", "CheckCapacity", 0);
