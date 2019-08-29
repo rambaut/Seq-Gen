@@ -106,7 +106,7 @@ static void PrintUsage()
 	fprintf(stderr, "  -k: # = use sequence k as ancestral (needs alignment) [default = random].\n");
 
 	fprintf(stderr, "\n Substitution model options:\n");
-	fprintf(stderr, "  -m: MODEL = HKY, F84, GTR, JTT, WAG, PAM, BLOSUM, MTREV, CPREV45, MTART, LG, GENERAL\n");
+	fprintf(stderr, "  -m: MODEL = HKY, F84, GTR, JTT, WAG, PAM, BLOSUM, MTREV, CPREV45, MTART, LG, HIVB, GENERAL\n");
 	fprintf(stderr, "      HKY, F84 & GTR are for nucleotides the rest are for amino acids\n");
 	fprintf(stderr, "  -a: # = shape (alpha) for gamma rate heterogeneity [default = none].\n");
 	fprintf(stderr, "  -g: # = number of gamma rate categories [default = continuous].\n");

@@ -58,6 +58,7 @@ char *modelNames[numModels]={
 	"CPREV",
 	"MTART",
 	"LG",
+	"HIVB",
 	"GENERAL"
 };
 
@@ -73,6 +74,7 @@ char *modelTitles[numModels]={
 	"CPREV45: Adachi et al. (2000) J Mol Evol 50:348-358",
 	"MTART: Abascal et al. (2007) Mol Biol Evol 24:1-5",
 	"LG: Le & Gascuel (2008) Mol Biol Evol 25:1307-1320",
+	"HIVB: Nickle et al. (2007) PLoS ONE 6;2(6):e503",
 	"GENERAL: General time reversible (amino acids)"
 };
 
