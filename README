@@ -12,8 +12,7 @@ On most UNIX systems, to compile, type:
 cd source
 make
 
-A binary called 'seq-gen' will be created in the same directory as this
-README file.
+A binary called 'seq-gen' will be created in the source directory.
 
 Any questions about Seq-Gen should be sent to:
 
