@@ -63,6 +63,8 @@ double *partitionRates;
 double treeScale, branchScale;
 char treeFileName[256];
 char textFileName[256];
+char outputFilePrefix[256];
+char outputFileSuffix[256];
 
 int hasAlignment, numSequences, numAlignmentSites;
 char **names;
@@ -97,7 +99,9 @@ static void PrintUsage()
 { 
 	fprintf(stderr, "Usage: seq-gen [-m MODEL] [-l #] [-n #] [-p #] [-s # | -d #] [-k #]\n");
 	fprintf(stderr, "               [-c #1 #2 #3 | -a # [-g #]] [-i #] [-f e | #] [-t # | -r #]\n");
-	fprintf(stderr, "               [-z #] [-o[p][r][n]] [-w[a][r]] [-x NAME] [-q] [-h] [treefile]\n");
+	fprintf(stderr, "               [-o[p|r|n|f][s]] [-w[a][r]]\n");
+	fprintf(stderr, "               [-x NAME] [-y NAME] [-z #] [-q] [-h]\n");
+	fprintf(stderr, "               [treefile]\n");
 	fprintf(stderr, "  -l: # = sequence length [default = 1000].\n");
 	fprintf(stderr, "  -n: # = simulated datasets per tree [default = 1].\n");
 	fprintf(stderr, "  -p: # = number of partitions (and trees) per sequence [default = 1].\n");
@@ -125,17 +129,21 @@ static void PrintUsage()
 	fprintf(stderr, "  -r: #1 .. #190 = general rate matrix [default = all 1.0].\n");
 	fprintf(stderr, "  -f: #1 .. #20 = amino acid frequencies e=equal [default = matrix freqs].\n");
 	
-	fprintf(stderr, "\n Miscellaneous options:\n");
-	fprintf(stderr, "  -z: # = seed for random number generator [default = system generated].\n");
+	fprintf(stderr, "\n Output options:\n");
 	fprintf(stderr, "  -o: Output file format [default = PHYLIP]\n");
 	fprintf(stderr, "    p PHYLIP format\n");
 	fprintf(stderr, "    r relaxed PHYLIP format\n");
 	fprintf(stderr, "    n NEXUS format\n");
 	fprintf(stderr, "    f FASTA format\n");
+	fprintf(stderr, "    s Separate files for each dataset\n");
 	fprintf(stderr, "  -w: Write additional information [default = none]\n");
 	fprintf(stderr, "    a Write ancestral sequences for each node\n");
 	fprintf(stderr, "    r Write rate for each site\n");
 	fprintf(stderr, "  -x: NAME = a text file to insert after every dataset [default = none].\n");
+	fprintf(stderr, "  -y: NAME = name of output file [default = to stdout, required for FASTA].\n");
+
+	fprintf(stderr, "\n Miscellaneous options:\n");
+	fprintf(stderr, "  -z: # = seed for random number generator [default = system generated].\n");
 	fprintf(stderr, "  -h: Give this help message\n");
 	fprintf(stderr, "  -q: Quiet\n");
 	fprintf(stderr, "  treefile: name of tree file [default = trees on stdin]\n\n");
@@ -192,6 +200,8 @@ void ReadParams(int argc, char **argv)
 	
  	verbose=1;
 	fileFormat = FASTAFormat;
+	outputFilePrefix[0] = '\0';
+	writeSeparateFiles = 1;
 	quiet=0;
 
 	treeFile=0;
@@ -272,6 +282,20 @@ void ReadParams(int argc, char **argv)
 			}
 			textFile=1;
 			strcpy(textFileName, P);
+		} else if (*P=='-' && toupper(*(P+1))=='Y') {
+			P++; P++;
+			if (*P=='\0') {
+				i++;
+				P = argv[i];
+			}
+			strcpy(outputFilePrefix, P);
+		} else if (*P=='-' && toupper(*(P+1))=='U') {
+			P++; P++;
+			if (*P=='\0') {
+				i++;
+				P = argv[i];
+			}
+			strcpy(outputFileSuffix, P);
 		} else {
 			P++;
 			ch=toupper(*P);
@@ -451,14 +475,20 @@ void ReadParams(int argc, char **argv)
 				break;
 				case 'O':
 					switch (toupper(*P)) {
-						case 'P': fileFormat=PHYLIPFormat; break;
-						case 'R': fileFormat=RelaxedFormat; break;
-						case 'N': fileFormat=NEXUSFormat; break;
-						case 'F': fileFormat=FASTAFormat; break;
+						case 'P': fileFormat=PHYLIPFormat; sprintf(outputFileSuffix, "phy"); break;
+						case 'R': fileFormat=RelaxedFormat; sprintf(outputFileSuffix, "phy"); break;
+						case 'N': fileFormat=NEXUSFormat; sprintf(outputFileSuffix, "nex"); break;
+						case 'F': fileFormat=FASTAFormat; sprintf(outputFileSuffix, "fasta"); break;
 						default:					
 							fprintf(stderr, "Unknown output format: %s\n\n", argv[i]);
 							PrintUsage();
 							exit(1);
+					}
+					if (toupper(*(P+1)) == 'S') {
+						writeSeparateFiles = 1;
+						P++;
+					} else if (fileFormat == FASTAFormat) {
+						writeSeparateFiles = 1;
 					}
 				break;
 				case 'W':
@@ -593,6 +623,14 @@ void PrintVerbose(FILE *fv)
 	if (writeRates) {
 		fprintf(fv, "Writing rate for each site\n");
 	}
+	if (writeSeparateFiles) {
+		fprintf(fv, "Writing each dataset as a separate file with prefix: %s\n", outputFilePrefix);
+	} else if (outputFilePrefix[0] != '\0') {
+		fprintf(fv, "Writing all datasets to a single file with name: %s", outputFilePrefix);
+	} else {
+		fprintf(fv, "Writing all datasets to standard output");
+	}
+
 	fputc('\n', fv);
 }
 
@@ -748,13 +786,19 @@ int main(int argc, char **argv)
 	}
 
 	if (writeAncestors && fileFormat == NEXUSFormat) {
-		fprintf(stderr, "Warning - When writing ancestral sequences, relaxed PHYLIP format is used.\n");
-	}
-
-	if (writeAncestors && maxPartitions > 1) {
-		fprintf(stderr, "Writing ancestral sequences can only be used for a single partition.\n");
+		fprintf(stderr, "Unable to write ancestral sequences in NEXUS format.\n");
 		exit(4);
 	}
+
+	if (writeAncestors && maxPartitions > 1 && !writeSeparateFiles) {
+		fprintf(stderr, "Writing ancestral sequences can only be used for a single partition or writing to multiple files.\n");
+		exit(4);
+	}
+
+	// if (writeSeparateFiles && fileFormat == FASTAFormat && outputFileName[0] == '\0') {
+	// 	fprintf(stderr, "Output file name must be specified when using FASTA format.\n");
+	// 	exit(4);
+	// }
 			
 	if (!userSeed)
 		randomSeed = CreateSeed();
@@ -833,7 +877,23 @@ int main(int argc, char **argv)
 					
 	CreateRates();
 	
+	FILE *fv = NULL;
+	char* fileName = (char *)malloc(sizeof(char) * 256);
+
+	if (outputFilePrefix[0] == '\0') {
+		fv = stdout;
+	} else {
+		sprintf(fileName, "%s", outputFilePrefix);
+		sprintf(fileName, "%s.%s", fileName, outputFileSuffix);
+		fv = fopen(fileName, "wt");
+		if (fv == NULL) {
+			fprintf(stderr, "Error opening output file: '%s'\n", fileName);
+			exit(4);
+		}
+	}
+
 	treeNo=0;
+	int outputFileNo=0;
 	do {
 		partitionLengths[0] = -1;
 		ReadTree(tree_fv, treeSet[0], treeNo+1, 0, NULL, &partitionLengths[0], &partitionRates[0]);
@@ -919,6 +979,39 @@ int main(int argc, char **argv)
 		}
 
 		for (i=0; i<numDatasets; i++) {
+			int datasetNo = i + 1;
+
+			if (writeSeparateFiles) {
+				char* paddingFormat = (char *)malloc(sizeof(char) * 16);
+
+				// determine the padding required for the dataset number
+				int padding = 1;
+				int temp = numDatasets;
+				while (temp > 9) {
+					temp /= 10;
+					padding++;
+				}
+				sprintf(paddingFormat, "%%s_%%0%dd.%%s", padding);
+
+				if (outputFilePrefix[0] != '\0') {
+					sprintf(fileName, "%s", outputFilePrefix);
+				} else {
+					sprintf(fileName, "output");
+				}
+				if (numTrees > 1) {
+					sprintf(fileName, "%s_tree%d", fileName, treeNo);
+				}
+				sprintf(fileName, paddingFormat, fileName, datasetNo, outputFileSuffix);
+
+				outputFileNo++;
+
+				fv = fopen(fileName, "wt");
+				if (fv == NULL) {
+					fprintf(stderr, "Error opening output file: '%s'\n", fileName);
+					exit(4);
+				}
+			}
+
 			SetCategories();
 			
 			k = 0;

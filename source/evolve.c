@@ -49,7 +49,7 @@
 #include "gamma.h"
 #include "twister.h"
 
-int numTaxa, numSites, maxPartitions, numPartitions, fileFormat;
+int numTaxa, numSites, maxPartitions, numPartitions, fileFormat, writeSeparateFiles;
 
 double gammaShape, proportionInvariable;
 int numCats, rateHetero, invariableSites;
