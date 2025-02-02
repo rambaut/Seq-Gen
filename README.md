@@ -24,8 +24,10 @@ Oxford OX1 3PS, U.K.
 
 On most UNIX systems, to compile, type:
 
+```
 cd source
 make
+```
 
 A binary called 'seq-gen' will be created in the source directory.
 
