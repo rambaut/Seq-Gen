@@ -29,12 +29,8 @@ make
 
 A binary called 'seq-gen' will be created in the source directory.
 
-Any questions about Seq-Gen should be sent to:
-
-	Andrew Rambaut <a.rambaut@ed.ac.uk>
-
 # Usage
 
 A manual for the use of the software is in the `documentation` folder or can be viewed here:
 
-http://rambaut.github.io/seq-gen/manual
+[http://rambaut.github.io/seq-gen/manual](http://rambaut.github.io/Seq-Gen/)
