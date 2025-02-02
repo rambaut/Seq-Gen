@@ -307,7 +307,7 @@ TNode *ReadTip(FILE *fv, char ch, TTree *tree, int numNames, char **names)
 	
 	P=name;
 	while (!feof(fv) && ch!=':' && ch!=',' && ch!=')' && i<MAX_NAME_LEN) {
-		if (!isspace(ch)) {
+		if (!isspace(ch) && ch != '\'' && ch != '"') {
 			*P=ch;
 			i++;P++;
 		}

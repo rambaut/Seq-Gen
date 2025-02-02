@@ -889,13 +889,13 @@ int main(int argc, char **argv)
 		}
 	}
 
-	treeNo=0;
+	treeNo=1;
 	int outputFileNo=0;
 	do {
 		partitionLengths[0] = -1;
-		ReadTree(tree_fv, treeSet[0], treeNo+1, 0, NULL, &partitionLengths[0], &partitionRates[0]);
+		ReadTree(tree_fv, treeSet[0], treeNo, 0, NULL, &partitionLengths[0], &partitionRates[0]);
 
-		if (treeNo==0) {
+		if (treeNo==1) {
 			numTaxa=treeSet[0]->numTips;
 			
 			if (!quiet)
@@ -934,7 +934,7 @@ int main(int argc, char **argv)
 				exit(4);
 			}
 				
-			ReadTree(tree_fv, treeSet[i], treeNo+1, treeSet[0]->numTips, treeSet[0]->names, 
+			ReadTree(tree_fv, treeSet[i], treeNo, treeSet[0]->numTips, treeSet[0]->names, 
 						&partitionLengths[i], &partitionRates[i]);
 						
 			if (treeSet[i]->numTips != numTaxa) {
@@ -969,21 +969,29 @@ int main(int argc, char **argv)
 				partitionRates[i] *= numSites / sum;
 		}
 		
-		if (treeNo==0 && verbose && !quiet) {
+		if (treeNo==1 && verbose && !quiet) {
 			PrintVerbose(stderr);
 			InitProgressBar(numTrees*numDatasets);
 			DrawProgressBar();
 		}
 
 		for (i=0; i<numDatasets; i++) {
-			int datasetNo = i + 1;
+			int fileNo;
+			int numFiles;
+			if (numTrees > 1 && numDatasets > 1) {
+				fileNo = i + 1;
+				numFiles = numDatasets;
+			} else {
+				fileNo = treeNo;
+				numFiles = numTrees;
+			}
 
 			if (writeSeparateFiles) {
 				char* paddingFormat = (char *)malloc(sizeof(char) * 16);
 
 				// determine the padding required for the dataset number
 				int padding = 1;
-				int temp = numDatasets;
+				int temp = numFiles;
 				while (temp > 9) {
 					temp /= 10;
 					padding++;
@@ -995,10 +1003,10 @@ int main(int argc, char **argv)
 				} else {
 					sprintf(fileName, "output");
 				}
-				if (numTrees > 1) {
+				if (numTrees > 1 && numDatasets > 1) {
 					sprintf(fileName, "%s_tree%d", fileName, treeNo);
 				}
-				sprintf(fileName, paddingFormat, fileName, datasetNo, outputFileSuffix);
+				sprintf(fileName, paddingFormat, fileName, fileNo, outputFileSuffix);
 
 				outputFileNo++;
 
@@ -1029,9 +1037,9 @@ int main(int argc, char **argv)
 			}
 			
 			if (writeAncestors)
-				WriteAncestralSequences(stdout, treeSet[0]);
+				WriteAncestralSequences(fv, treeSet[0]);
 			else
-				WriteSequences(stdout, (numTrees > 1 ? treeNo+1 : -1), (numDatasets > 1 ? i+1 : -1), treeSet, partitionLengths);
+				WriteSequences(fv, (numTrees > 1 ? treeNo : -1), (numDatasets > 1 ? i+1 : -1), treeSet, partitionLengths);
 
 			if (writeRates) {
 				WriteRates(stderr);
@@ -1041,9 +1049,9 @@ int main(int argc, char **argv)
 				while (!feof(text_fv)) {
 					ch = fgetc(text_fv);
 					if (!feof(text_fv))
-						fputc(ch, stdout);
+						fputc(ch, fv);
 				}
-				fputc('\n', stdout);
+				fputc('\n', fv);
 				rewind(text_fv);
 			}
 			
