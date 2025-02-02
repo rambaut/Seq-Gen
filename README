@@ -1,11 +1,30 @@
-This package is the generic source-code version. This can be compiled
-and run on most UNIX/Linux/Mac OS X systems. It can also be compiled 
-for Windows. For Mac OS X a pre-compiled version is available from
-the website:
 
-http://tree.bio.ed.ac.uk/software/Seq-Gen/
+-------------------------------------------------------------------------------------------------------------------------------------------
 
-There is a manual in HTML format in the doc/ directory of this package.
+![](icon.gif)
+
+_© Copyright 1996-2025  
+Andrew Rambaut and Nicholas C. Grassly_
+----------------------------------------------------------------
+
+Supported by [The Royal Society of London](http://www.royalsoc.ac.uk/)
+----------------------------------------------------------------------
+
+Institute of Evolutionary Biology,  
+University of Edinburgh,  
+Ashworth Laboratories,  
+King's Buildings,  
+Edinburgh EH9 3FL, U.K.
+
+  
+Originally developed at:
+
+Department of Zoology,  
+University of Oxford,  
+South Parks Road,  
+Oxford OX1 3PS, U.K.
+
+# Installation
 
 On most UNIX systems, to compile, type:
 
@@ -17,3 +36,9 @@ A binary called 'seq-gen' will be created in the source directory.
 Any questions about Seq-Gen should be sent to:
 
 	Andrew Rambaut <a.rambaut@ed.ac.uk>
+
+# Usage
+
+A manual for the use of the software is in the `documentation` folder or can be viewed here:
+
+http://rambaut.github.io/seq-gen/

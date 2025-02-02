@@ -20,7 +20,7 @@ Institute of Evolutionary Biology,
 University of Edinburgh,  
 Ashworth Laboratories,  
 King's Buildings,  
-Edinburgh EH9 2FL, U.K.
+Edinburgh EH9 3FL, U.K.
 
   
 Originally developed at:
@@ -31,36 +31,14 @@ South Parks Road,
 Oxford OX1 3PS, U.K.
 
 #### New features and bugs fixed in version 1.3.5 - 2 Feb 2025
-  
 
-#### New features and bugs fixed in version 1.3.4 - 16 Sept 2017
+*   Option `-o` now allows modifier `s` to write separate files for each dataset
+*   Option `-y` specifies the prefix for the files (if given will write to a file not stdout)
+*   Option `-u` specifies a suffix or file extension (appropriate defaults by file format)
+*   #issue 28: ancestral sequences not written in specified format
+*   #issue 27: wrong number of ancestral sequences given in header     
+*   #issue 19: ancestral sequences written in same order as input
 
-*   FASTA format output (thanks to Kevin Murray)
-*   Errors now return a non-zero error code.
-*   White space at the end of the last sequence no longer prevents the tree from being read.
-*   If the tree file was specified as a command line option the program was hanging.
-*   Command line options now allows a space for the model (i.e., -m HKY).
-*   Long standing error fixed when expanding memory allocated for big trees (thanks Frédéric Lemoine).
-
-#### New features and bugs fixed in version 1.3.3 - 28 Oct 2011
-
-*   MtArt amino acid model added by Lars Jermiin.
-*   Memory allocation bugs (thanks to Graham Jones for submitting a fix)
-*   Rare array overflow causing odd characters in sequence. Thanks to Howard Ross, Jeff Thorne and Michael Ott for independently spotting this error and Michael and Lars Jermiin for submitting a fix.
-
-#### Bug fixed in version 1.3.2 - 7 Jan 2005
-
-*   The PAM (Dayhoff) and Blosum matrices were interchanged so specifying one would result in the other being used instead.
-
-#### Bug fixed in version 1.3.1 - 4 Nov 2004
-
-*   Specified nucleotide frequencies were being ignored and equal frequencies being used instead.
-
-#### New Features in version 1.3 - 30 Aug 2004
-
-*   Added amino acid simulation to Seq-Gen. This replaces PSeq-Gen which was not being updated but also adds a number of other amino acid models.
-*   Removed the limit on tree size. The only limit now is the available memory.
-*   Updated to the latest version of the MT19937 random number generator.
 
 #### Citation
 
@@ -80,14 +58,10 @@ Requirements
 
 Seq-Gen is a command-line controlled program written in ANSI C. It should be easily compiled and run on any UNIX system or workstation (which includes Mac OS X). This paper describes the use of Seq-Gen on a UNIX machine. The application requires an amount of memory proportional to the size of each simulated sequence data set.
 
-The Mac OS X version of Seq-Gen now functions in the same way as the UNIX version using the 'Terminal' application. There is however a new graphical user-interface that can be used to run Seq-Gen on Mac OS X (and hopefully soon, Windows and Linux) written by Thomas Wilcox. This is available in the Mac OS X package for Seq-Gen:
-
-[http://evolve.zoo.ox.ac.uk/software/Seq-Gen/](http://evolve.zoo.ox.ac.uk/software/Seq-Gen/)
-
 Acknowledgements
 ----------------
 
-A.R is supported by a Royal Society University Research Fellowship and previously was supported by grant 50275 from The Wellcome Trust. N.C.G. is also supported by a Royal Society University Research Fellowship. We would like to thank Ziheng Yang for allowing us to use some invaluable code from PAML.
+A.R was supported by a Royal Society University Research Fellowship during the original development of this software and previously was supported by grant 50275 from The Wellcome Trust. N.C.G. is also supported by a Royal Society University Research Fellowship. We would like to thank Ziheng Yang for allowing us to use some invaluable code from PAML.
 
 The models of substitution
 --------------------------
@@ -194,7 +168,11 @@ will generate 3 partitions (300bp, 400bp and 300bp) with relative rates of 0.5, 
 Output File Format
 ------------------
 
-The default format for the output files was chosen for its simplicity and for the wide range of programs that use it. All of the programs in the PHYLIP package that accept molecular sequences can analyse multiple data sets in the format produced by Seq-Gen. Seq-Gen can now also generate NEXUS format output (see the `-o` option, below) for use with the PAUP program (Swofford, 1993). A PAUP command block (or any other text) can be inserted between each simulated dataset to automate the analysis process (see the `-x` option, below).
+The default format for the output files is now FASTA format and was chosen for its simplicity and for the wide range of programs that use it. This format will generate a separate file for each dataset generated. The prefix of the file name can be specified with the `-y` option and the suffix or file extension with the `-u` option. The file name will have the format: `prefix_N.suffix` where N is the dataset number (padded with zeros).
+
+Seq-Gen can also generate NEXUS format or PHYLIP format output (see the `-o` option, below) for use with the PAUP program (Swofford, 1993). A PAUP command block (or any other text) can be inserted between each simulated dataset to automate the analysis process (see the `-x` option, below). These formats allow multiple data sets per file so this is the default. 
+
+Separate files for each datasets can be forced using the `s` modifier to the `-o` option. I.e., `-ons` will create a set of NEXUS files, one for each dataset.
 
 Parameters to control Seq-Gen
 -----------------------------
@@ -431,6 +409,44 @@ Yang, Z. (1996) Among-site rate variation and its impact on phylogenetic analyse
 
 Version History.
 ----------------
+
+#### New features and bugs fixed in version 1.3.5 - 2 Feb 2025
+
+*   Option `-o` now allows modifier `s` to write separate files for each dataset
+*   Option `-y` specifies the prefix for the files (if given will write to a file not stdout)
+*   Option `-u` specifies a suffix or file extension (appropriate defaults by file format)
+*   #issue 28: ancestral sequences not written in specified format
+*   #issue 27: wrong number of ancestral sequences given in header     
+*   #issue 19: ancestral sequences written in same order as input
+
+#### New features and bugs fixed in version 1.3.4 - 16 Sept 2017
+
+*   FASTA format output (thanks to Kevin Murray)
+*   Errors now return a non-zero error code.
+*   White space at the end of the last sequence no longer prevents the tree from being read.
+*   If the tree file was specified as a command line option the program was hanging.
+*   Command line options now allows a space for the model (i.e., -m HKY).
+*   Long standing error fixed when expanding memory allocated for big trees (thanks Frédéric Lemoine).
+
+#### New features and bugs fixed in version 1.3.3 - 28 Oct 2011
+
+*   MtArt amino acid model added by Lars Jermiin.
+*   Memory allocation bugs (thanks to Graham Jones for submitting a fix)
+*   Rare array overflow causing odd characters in sequence. Thanks to Howard Ross, Jeff Thorne and Michael Ott for independently spotting this error and Michael and Lars Jermiin for submitting a fix.
+
+#### Bug fixed in version 1.3.2 - 7 Jan 2005
+
+*   The PAM (Dayhoff) and Blosum matrices were interchanged so specifying one would result in the other being used instead.
+
+#### Bug fixed in version 1.3.1 - 4 Nov 2004
+
+*   Specified nucleotide frequencies were being ignored and equal frequencies being used instead.
+
+#### New Features in version 1.3 - 30 Aug 2004
+
+*   Added amino acid simulation to Seq-Gen. This replaces PSeq-Gen which was not being updated but also adds a number of other amino acid models.
+*   Removed the limit on tree size. The only limit now is the available memory.
+*   Updated to the latest version of the MT19937 random number generator.
 
 #### Bug fixed in version 1.3.2 - 7 Jan 2005
 

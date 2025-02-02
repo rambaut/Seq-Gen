@@ -810,10 +810,7 @@ int main(int argc, char **argv)
 	
 	numTrees = OpenTreeFile();
 
-	/* if (!treeFile) { */
-		ReadFileParams();
-	/*} */
-
+	ReadFileParams();
 
 	if ((ancestorSeq>0 && !hasAlignment) || ancestorSeq>numSequences) {
 		fprintf(stderr, "Bad ancestral sequence number: %d (%d sequences loaded)\n", ancestorSeq, numSequences);
