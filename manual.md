@@ -1,5 +1,3 @@
- Seq-Gen: Simulation of molecular sequences body { font-family: Helvetica, Arial, Sans-Serif; }
-
 _Seq-Gen_
 =========
 
@@ -7,13 +5,10 @@ Sequence-Generator: An application for the Monte Carlo simulation of molecular s
 Version 1.3.5
 -------------------------------------------------------------------------------------------------------------------------------------------
 
-![](icon.gif)
-
-_© Copyright 1996-2025  
-Andrew Rambaut and Nicholas C. Grassly_
+© Copyright 1996-2025 Andrew Rambaut and Nicholas C. Grassly
 ----------------------------------------------------------------
 
-Supported by [The Royal Society of London](http://www.royalsoc.ac.uk/)
+Supported by [The Wellcome Trust](http://wellcome.org) & [The Royal Society of London](http://www.royalsoc.ac.uk/)
 ----------------------------------------------------------------------
 
 Institute of Evolutionary Biology,  
