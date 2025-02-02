@@ -1,13 +1,9 @@
 
--------------------------------------------------------------------------------------------------------------------------------------------
 
-![](icon.gif)
-
-_© Copyright 1996-2025  
-Andrew Rambaut and Nicholas C. Grassly_
+© Copyright 1996-2025 Andrew Rambaut and Nicholas C. Grassly
 ----------------------------------------------------------------
 
-Supported by [The Royal Society of London](http://www.royalsoc.ac.uk/)
+Supported by [The Wellcome Trust](http://wellcome.org) & [The Royal Society of London](http://www.royalsoc.ac.uk/)
 ----------------------------------------------------------------------
 
 Institute of Evolutionary Biology,  
