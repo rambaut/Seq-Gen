@@ -547,18 +547,25 @@ void WriteNexusFormat(FILE *fv, int treeNo, int datasetNo, TTree **treeSet, int 
 
 void WriteAncestralSequences(FILE *fv, TTree *tree)
 {
-	int j, n;
+	int j, n, nodeNo;
 	char *P;
 
-	if (!tree->rooted)
-		n = (2 * numTaxa) - 2;
-	else
-		n = (2 * numTaxa) - 1;
-	fprintf(fv, " %d %d\n", n, numSites);
+	if (fileFormat != FASTAFormat) {
+		if (!tree->rooted)
+			n = (2 * numTaxa) - 2;
+		else
+			n = (2 * numTaxa) - 1;
+		fprintf(fv, " %d %d\n", n, numSites);
+	}
 
-	n = numTaxa + 1;
+	nodeNo = numTaxa + 1;
 	
-	fprintf(fv, "%d\t", n);
+	/* write the root sequence */
+	if (fileFormat == FASTAFormat) {
+		fprintf(fv, ">%d\n", nodeNo);
+	} else {
+		fprintf(fv, "%d\t", nodeNo);
+	}
 	P=tree->root->sequence;
 	for (j=0; j<numSites; j++) {
 		fputc(stateCharacters[(int)*P], fv);
@@ -566,10 +573,11 @@ void WriteAncestralSequences(FILE *fv, TTree *tree)
 	}
 	fputc('\n', fv);
 	
-	WriteAncestralSequencesNode(fv, tree, &n, tree->root->branch1);
-	WriteAncestralSequencesNode(fv, tree, &n, tree->root->branch2);
+	/* recurse the tree and write the remaining sequnces */
+	WriteAncestralSequencesNode(fv, tree, &nodeNo, tree->root->branch1);
+	WriteAncestralSequencesNode(fv, tree, &nodeNo, tree->root->branch2);
 	if (!tree->rooted)
-		WriteAncestralSequencesNode(fv, tree, &n, tree->root->branch0);
+		WriteAncestralSequencesNode(fv, tree, &nodeNo, tree->root->branch0);
 }
 
 void WriteAncestralSequencesNode(FILE *fv, TTree *tree, int *nodeNo, TNode *des)
@@ -580,7 +588,11 @@ void WriteAncestralSequencesNode(FILE *fv, TTree *tree, int *nodeNo, TNode *des)
 	if (des->tipNo==-1) {
 		(*nodeNo)++;
 		
-		fprintf(fv, "%d\t", *nodeNo);
+		if (fileFormat == FASTAFormat) {
+			fprintf(fv, ">%d\n", *nodeNo);
+		} else {
+			fprintf(fv, "%d\t", *nodeNo);
+		}
 		for (j=0; j<numSites; j++) {
 			fputc(stateCharacters[(int)*P], fv);
 			P++;
@@ -590,7 +602,11 @@ void WriteAncestralSequencesNode(FILE *fv, TTree *tree, int *nodeNo, TNode *des)
 		WriteAncestralSequencesNode(fv, tree, nodeNo, des->branch1);
 		WriteAncestralSequencesNode(fv, tree, nodeNo, des->branch2);
 	} else {
-		fprintf(fv, "%s\t", tree->names[des->tipNo]);
+		if (fileFormat == FASTAFormat) {
+			fprintf(fv, ">%s\n", tree->names[des->tipNo]);
+		} else {
+			fprintf(fv, "%s\t", tree->names[des->tipNo]);
+		}
 		for (j=0; j<numSites; j++) {
 			fputc(stateCharacters[(int)*P], fv);
 			P++;
