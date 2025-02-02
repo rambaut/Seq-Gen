@@ -36,7 +36,7 @@ double rndgamma (double s)
 	else if (s > 1.0)  
 		r = rndgamma2 (s);
 	else           
-		r =- log(rndu());
+		r = -log(rndu());
 	return (r);
 }
 

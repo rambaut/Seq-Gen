@@ -551,9 +551,9 @@ void WriteAncestralSequences(FILE *fv, TTree *tree)
 	char *P;
 
 	if (!tree->rooted)
-		n = (2 * numTaxa) - 1;
-	else
 		n = (2 * numTaxa) - 2;
+	else
+		n = (2 * numTaxa) - 1;
 	fprintf(fv, " %d %d\n", n, numSites);
 
 	n = numTaxa + 1;
