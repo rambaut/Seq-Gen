@@ -33,4 +33,4 @@ A binary called 'seq-gen' will be created in the source directory.
 
 A manual for the use of the software is in the `documentation` folder or can be viewed here:
 
-[http://rambaut.github.io/seq-gen/manual](http://rambaut.github.io/Seq-Gen/)
+[http://rambaut.github.io/seq-gen/manual](http://rambaut.github.io/Seq-Gen/manual)
