@@ -191,7 +191,7 @@ void ReadParams(int argc, char **argv)
 	writeRates=0;
 	
  	verbose=1;
-	fileFormat = PHYLIPFormat;
+	fileFormat = FASTAFormat;
 	quiet=0;
 
 	treeFile=0;
