@@ -511,12 +511,14 @@ void PrintVerbose(FILE *fv)
 	}
 	
 	if (scaleTrees) {
-		fprintf(fv, "Branch lengths of trees scaled so that tree is %G from root to tip\n\n", treeScale);
+		fprintf(fv, "Branch lengths of trees scaled so that tree is %G from root to tip\n", treeScale);
 	} else if (scaleBranches) {
-		fprintf(fv, "Branch lengths of trees multiplied by %G\n\n", branchScale);
+		fprintf(fv, "Branch lengths of trees multiplied by %G\n", branchScale);
 	} else {
-		fprintf(fv, "Branch lengths assumed to be number of substitutions per site\n\n");
+		fprintf(fv, "Branch lengths assumed to be number of substitutions per site\n");
 	}
+	fputc('\n', fv);
+
 	if (rateHetero==CodonRates) {
 		fprintf(fv, "Codon position rate heterogeneity:\n");
 		fprintf(fv, "    rates = 1:%f 2:%f 3:%f\n", catRate[0], catRate[1], catRate[2]);
@@ -528,10 +530,12 @@ void PrintVerbose(FILE *fv)
 		fprintf(fv, "    shape = %f, %d categories\n", gammaShape, numCats);
 	} else
 		fprintf(fv, "Rate homogeneity of sites.\n");
+
 	if (invariableSites) {
 		fprintf(fv, "Invariable sites model:\n");
 		fprintf(fv, "    proportion invariable = %f\n", proportionInvariable);
 	}
+
 	fprintf(fv, "Model = %s\n", modelTitles[model]);
 	if (isNucModel) {
 		if (equalTstv) {
@@ -563,10 +567,33 @@ void PrintVerbose(FILE *fv)
 				for (i = 0; i < NUM_AA; i++) {
 					fprintf(fv, " %c=%G", aminoAcids[i], freq[i]);
 				}
-				fprintf(fv, "\n\n");
+				fprintf(fv, "\n");
 			}
 		}
 	}
+	fputc('\n', fv);
+
+	switch (fileFormat) {
+		case PHYLIPFormat:
+			fprintf(fv, "Output format: PHYLIP\n");
+		break;
+		case RelaxedFormat:
+			fprintf(fv, "Output format: Relaxed PHYLIP\n");
+		break;
+		case NEXUSFormat:
+			fprintf(fv, "Output format: NEXUS\n");
+		break;
+		case FASTAFormat:
+			fprintf(fv, "Output format: FASTA\n");
+		break;
+	}
+	if (writeAncestors) {
+		fprintf(fv, "Writing ancestral sequences for each node\n");
+	}
+	if (writeRates) {
+		fprintf(fv, "Writing rate for each site\n");
+	}
+	fputc('\n', fv);
 }
 
 void ReadFileParams()
