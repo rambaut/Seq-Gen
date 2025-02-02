@@ -42,4 +42,4 @@ Any questions about Seq-Gen should be sent to:
 
 A manual for the use of the software is in the `documentation` folder or can be viewed here:
 
-http://rambaut.github.io/seq-gen/
+http://rambaut.github.io/seq-gen/manual
