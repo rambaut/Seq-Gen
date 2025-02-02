@@ -566,10 +566,10 @@ void WriteAncestralSequences(FILE *fv, TTree *tree)
 	}
 	fputc('\n', fv);
 	
-	if (!tree->rooted)
-		WriteAncestralSequencesNode(fv, tree, &n, tree->root->branch0);
 	WriteAncestralSequencesNode(fv, tree, &n, tree->root->branch1);
 	WriteAncestralSequencesNode(fv, tree, &n, tree->root->branch2);
+	if (!tree->rooted)
+		WriteAncestralSequencesNode(fv, tree, &n, tree->root->branch0);
 }
 
 void WriteAncestralSequencesNode(FILE *fv, TTree *tree, int *nodeNo, TNode *des)
