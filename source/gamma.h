@@ -5,9 +5,6 @@
    Copyright (c)1996-2025, Andrew Rambaut
    Institute of Evolutionary Biology, University of Edinburgh			
 
-   The code in this file is taken from Ziheng Yang's PAML package.
-   http://abacus.gene.ucl.ac.uk/
-
    Any feedback is very welcome.
    http://tree.bio.ed.ac.uk/software/seqgen/
    email: a.rambaut@ed.ac.uk

@@ -3,8 +3,10 @@
    Copyright (c)1996-2025, Andrew Rambaut
    Institute of Evolutionary Biology, University of Edinburgh			
 
-   The code in this file is taken from Ziheng Yang's PAML package.
+   The code in this file is taken from Ziheng Yang's PAML package, distributed under the GNU GPL v3
+
    http://abacus.gene.ucl.ac.uk/
+   https://github.com/abacus-gene/paml
 
    Any feedback is very welcome.
    http://tree.bio.ed.ac.uk/software/seqgen/
