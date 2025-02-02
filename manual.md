@@ -5,7 +5,7 @@
 
 © Copyright 1996-2025 Andrew Rambaut and Nicholas C. Grassly
 
-Supported by [The Wellcome Trust](http://wellcome.org) & [The Royal Society of London](http://www.royalsoc.ac.uk/)
+Supported by [The Wellcome Trust](http://wellcome.org) & [The Royal Society of London](https://royalsociety.org)
 
 Institute of Evolutionary Biology,  
 University of Edinburgh,  
