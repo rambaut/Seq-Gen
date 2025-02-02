@@ -4,12 +4,12 @@ _Seq-Gen_
 =========
 
 Sequence-Generator: An application for the Monte Carlo simulation of molecular sequence evolution along phylogenetic trees.  
-Version 1.3.4
+Version 1.3.5
 -------------------------------------------------------------------------------------------------------------------------------------------
 
 ![](icon.gif)
 
-_© Copyright 1996-2017  
+_© Copyright 1996-2025  
 Andrew Rambaut and Nicholas C. Grassly_
 ----------------------------------------------------------------
 
@@ -30,6 +30,7 @@ University of Oxford,
 South Parks Road,  
 Oxford OX1 3PS, U.K.
 
+#### New features and bugs fixed in version 1.3.5 - 2 Feb 2025
   
 
 #### New features and bugs fixed in version 1.3.4 - 16 Sept 2017

@@ -1,6 +1,6 @@
 /*  
-   Sequence Generator - seq-gen, version 1.3.4
-   Copyright (c)1996-2017, Andrew Rambaut & Nick Grassly
+   Sequence Generator - seq-gen, version 1.3.5
+   Copyright (c)1996-2025, Andrew Rambaut
    Institute of Evolutionary Biology, University of Edinburgh			
    All rights reserved.                          
 
@@ -551,7 +551,7 @@ void WriteAncestralSequences(FILE *fv, TTree *tree)
 	char *P;
 
 	if (!tree->rooted)
-		n = (2 * numTaxa) - 3;
+		n = (2 * numTaxa) - 1;
 	else
 		n = (2 * numTaxa) - 2;
 	fprintf(fv, " %d %d\n", n, numSites);

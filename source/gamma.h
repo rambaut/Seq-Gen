@@ -1,8 +1,8 @@
 /*  Header file for gamma.c                                */
 
 /*  
-   Sequence Generator - seq-gen, version 1.3.4
-   Copyright (c)1996-2017, Andrew Rambaut & Nick Grassly
+   Sequence Generator - seq-gen, version 1.3.5
+   Copyright (c)1996-2025, Andrew Rambaut
    Institute of Evolutionary Biology, University of Edinburgh			
 
    The code in this file is taken from Ziheng Yang's PAML package.

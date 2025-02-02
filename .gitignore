@@ -2,4 +2,4 @@
 *.o
 *~
 *.swp
-source/seq-gen
+.DS_Store

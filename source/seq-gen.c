@@ -1,6 +1,6 @@
 /*  
-   Sequence Generator - seq-gen, version 1.3.4
-   Copyright (c)1996-2017, Andrew Rambaut & Nick Grassly
+   Sequence Generator - seq-gen, version 1.3.5
+   Copyright (c)1996-2025, Andrew Rambaut
    Institute of Evolutionary Biology, University of Edinburgh			
    All rights reserved.                          
 
@@ -54,7 +54,7 @@
 #include "twister.h"
 
 #define PROGRAM_NAME "seq-gen"
-#define VERSION_NUMBER "Version 1.3.4"
+#define VERSION_NUMBER "Version 1.3.5"
 
 int treeFile, textFile, numDatasets, numTrees;
 int scaleTrees, scaleBranches, ancestorSeq, writeAncestors, writeRates;
@@ -74,8 +74,8 @@ FILE *tree_fv;
 
 static void PrintTitle();
 static void PrintUsage();
-static void PrintVerbose(FILE *fv);
-static void ReadParams();
+static void PrintVerbose(FILE *);
+static void ReadParams(int, char **);
 static void ReadFileParams();
 static void AllocateMemory();
 static void ReadFile();
@@ -87,7 +87,7 @@ static void PrintTitle()
 {
 	fprintf(stderr, "Sequence Generator - %s\n", PROGRAM_NAME);
 	fprintf(stderr, "%s\n", VERSION_NUMBER);
-	fprintf(stderr, "(c) Copyright, 1996-2017 Andrew Rambaut and Nick Grassly\n");
+	fprintf(stderr, "(c) Copyright, 1996-2025 Andrew Rambaut\n");
 	fprintf(stderr, "Institute of Evolutionary Biology, University of Edinburgh\n\n");
 	fprintf(stderr, "Originally developed at:\n");
 	fprintf(stderr, "Department of Zoology, University of Oxford\n\n");
@@ -106,15 +106,17 @@ static void PrintUsage()
 	fprintf(stderr, "  -k: # = use sequence k as ancestral (needs alignment) [default = random].\n");
 
 	fprintf(stderr, "\n Substitution model options:\n");
-	fprintf(stderr, "  -m: MODEL = HKY, F84, GTR, JTT, WAG, PAM, BLOSUM, MTREV, CPREV45, MTART, LG, HIVB, GENERAL\n");
+	fprintf(stderr, "  -m: MODEL = HKY, F84, GTR, JTT, WAG, PAM, BLOSUM, MTREV, CPREV45, MTART, LG, GENERAL\n");
 	fprintf(stderr, "      HKY, F84 & GTR are for nucleotides the rest are for amino acids\n");
 	fprintf(stderr, "  -a: # = shape (alpha) for gamma rate heterogeneity [default = none].\n");
+	fprintf(stderr, "  -a: #1 #2 #3 = shape (alpha) for gamma rate heterogeneity for each codon position [default = none].\n");
 	fprintf(stderr, "  -g: # = number of gamma rate categories [default = continuous].\n");
 	fprintf(stderr, "  -i: # = proportion of invariable sites [default = 0.0].\n");
 
 	fprintf(stderr, "\n Nucleotide model specific options:\n");
 	fprintf(stderr, "  -c: #1 #2 #3 = rates for codon position heterogeneity [default = none].\n");
 	fprintf(stderr, "  -t: # = transition-transversion ratio [default = equal rate].\n");
+	fprintf(stderr, "  -t: #1 #2 #3 = transition-transversion ratio for each codon position [default = equal rate].\n");
 	fprintf(stderr, "  -r: #1 #2 #3 #4 #5 #6= general rate matrix [default = all 1.0].\n");
 	fprintf(stderr, "  -f: #A #C #G #T = nucleotide frequencies [default = all equal].\n");
 	
