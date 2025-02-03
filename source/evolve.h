@@ -47,7 +47,7 @@
 
 #define MAX_RATE_CATS 32
 
-extern int numTaxa, numSites, maxPartitions, numPartitions, fileFormat, writeSeparateFiles;
+extern int numTaxa, numSites, maxPartitions, numPartitions, fileFormat;
 
 extern double gammaShape, proportionInvariable;
 extern int numCats, rateHetero, invariableSites;
